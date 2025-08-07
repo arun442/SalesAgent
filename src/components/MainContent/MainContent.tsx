@@ -8,6 +8,7 @@ import Campaign from '../sections/Campaign'
 import MarketAnalysis from '../sections/marketAnalysis'
 import Settings from '../sections/Settings'
 import EmailSettingsComponent from '../EmailSettings'
+import Projects from '../sections/Projects';
 
 interface MainContentProps {
   activeSection: string
@@ -29,6 +30,8 @@ const MainContent = ({ activeSection, isMobileMenuOpen }: MainContentProps) => {
         return <MarketAnalysis />
       case 'Communication Settings':
         return <EmailSettingsComponent />
+      case 'Projects':
+        return <Projects />
       default:
         return <Dashboard />
     }

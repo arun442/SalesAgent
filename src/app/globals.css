@@ -25,3 +25,17 @@
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
   }
 }
+
+:root {
+  --primary: #305070;
+  --secondary: #112250;
+  --accent: #E0C58F;
+  --background: #F5F0E9;
+  --surface: #D9CBC2;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--background);
+  color: var(--primary);
+}
