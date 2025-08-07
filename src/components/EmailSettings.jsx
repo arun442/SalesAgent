@@ -49,14 +49,8 @@ export default function EmailSettingsComponent() {
       prompt: 'consent'
     }).toString(),
     
-    outlook: 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?' + new URLSearchParams({
-      client_id: 'YOUR_MICROSOFT_CLIENT_ID', // Replace with your actual Microsoft Client ID
-      redirect_uri: window.location.origin + '/auth/outlook/callback', // Your callback URL
-      response_type: 'code',
-      scope: 'https://graph.microsoft.com/mail.read https://graph.microsoft.com/user.read offline_access',
-      response_mode: 'query',
-      state: 'random_state_string' // Generate a random state for security
-    }).toString()
+    outlook: "https://stu.globalknowledgetech.com:8444/login"
+ 
   };
 
   const redirectUrl = authUrls[selectedProvider.id];

@@ -2,7 +2,7 @@
 import axios from 'axios';
  
    export const axiosPublic = axios.create({
-        baseURL: "http://stu.globalknowledgetech.com:4005/",
+        baseURL: "https://stu.globalknowledgetech.com:8444",
         headers: {
           "Content-Type": "application/json",
 

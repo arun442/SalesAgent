@@ -7,7 +7,7 @@ import Lead from '../sections/Lead'
 import Campaign from '../sections/Campaign'
 import MarketAnalysis from '../sections/marketAnalysis'
 import Settings from '../sections/Settings'
-import EmailSettingsComponent from '../EmailSettings'
+import Communication from '../sections/Communication'
 
 interface MainContentProps {
   activeSection: string
@@ -28,7 +28,7 @@ const MainContent = ({ activeSection, isMobileMenuOpen }: MainContentProps) => {
       case 'MarketAnalysis':
         return <MarketAnalysis />
       case 'Communication Settings':
-        return <EmailSettingsComponent />
+        return <Communication />
       default:
         return <Dashboard />
     }

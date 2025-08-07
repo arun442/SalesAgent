@@ -85,7 +85,7 @@ const Sidebar = ({
       <motion.aside
         initial={{ x: 0 }}
         animate={{ 
-          x: isMobileMenuOpen ? 0 : -250
+          x: isMobileMenuOpen ? 0 : -280
         }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
         className="fixed left-0 top-13 h-full w-64 glass-effect border-r bg-gradient-to-t from-indigo-500 to-blue-500 border-white/20 z-50"
