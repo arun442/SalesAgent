@@ -1,16 +1,21 @@
 'use client'
 import React, { useState, useEffect } from 'react';
 import { CheckCircle, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
-
+import  {setsection}  from '../../redux/sectionslice';
+import { useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation'; // <-- Correct for App Router
 export default function OAuthCallback() {
+  const router=useRouter()
+  const dispatch=useDispatch();
   const [status, setStatus] = useState('processing'); // processing, success, error
-  const [countdown, setCountdown] = useState(5);
+  const [countdown, setCountdown] = useState(10);
+  const [state,setstate]=useState('')
 
   useEffect(() => {
     // Extract URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get('code');
-    const state = urlParams.get('state');
+        const states = urlParams.get('state');
     const sessionState = urlParams.get('session_state');
 
     // Simulate OAuth processing
@@ -19,16 +24,23 @@ export default function OAuthCallback() {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        if (code && state) {
-          setStatus('success');
-          
+        if (code && states) {
+          const decoded = Buffer.from(states, 'base64').toString('utf8');
+      const stateObj = JSON.parse(decoded);
+      setstate(stateObj)
+      console.log(stateObj);
+      
+          setStatus(stateObj.status); 
           // Start countdown for auto-redirect
           const timer = setInterval(() => {
             setCountdown(prev => {
               if (prev <= 1) {
                 clearInterval(timer);
-                // In real app, use Next.js router: router.push('/dashboard')
-                window.location.href = '/dashboard';
+                // dispatch(setsection('Communication Settings'))
+if (stateObj.status=='success') {
+                  router.push('/Home')
+}
+                
                 return 0;
               }
               return prev - 1;
@@ -49,7 +61,7 @@ export default function OAuthCallback() {
 
   const handleManualRedirect = () => {
     // In real Next.js app, use: router.push('/dashboard')
-    window.location.href = '/dashboard';
+                router.push('/Home')
   };
 
   return (
@@ -66,7 +78,7 @@ export default function OAuthCallback() {
                 Completing Sign In
               </h1>
               <p className="text-gray-600 mb-6">
-                Please wait while we securely process your Google authentication...
+                Please wait while we securely process your {state.email_provider} authentication...
               </p>
               <div className="flex justify-center">
                 <div className="flex space-x-2">
@@ -90,7 +102,7 @@ export default function OAuthCallback() {
                 Welcome Back!
               </h1>
               <p className="text-gray-600 mb-6">
-                You've successfully signed in with Google. Redirecting to your dashboard in {countdown} seconds...
+                You've successfully configure in with {state.email_provider}. Redirecting to your dashboard in {countdown} seconds...
               </p>
               
               <button
@@ -112,12 +124,12 @@ export default function OAuthCallback() {
                 Authentication Failed
               </h1>
               <p className="text-gray-600 mb-6">
-                There was an issue processing your Google sign-in. Please try again.
+                There was an issue processing your {state.email_provider} configure. Please try again.
               </p>
               
               <div className="space-y-3">
                 <button
-                  onClick={() => window.location.href = '/login'}
+                  onClick={() =>{dispatch(setsection('Communication Settings')),router.push('/Home')}}
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3 px-6 rounded-xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
                 >
                   Try Again
@@ -136,11 +148,11 @@ export default function OAuthCallback() {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
-            Secured by Google OAuth 2.0
+            Secured by {state.email_provider} OAuth 2.0
           </p>
         </div>
 
-        {/* Floating Decorative Elements */}
+        {/* Floating Decorative Elements */} 
         <div className="absolute top-20 left-10 w-20 h-20 bg-blue-200 rounded-full opacity-20 animate-pulse"></div>
         <div className="absolute bottom-20 right-10 w-16 h-16 bg-purple-200 rounded-full opacity-20 animate-pulse" style={{animationDelay: '1s'}}></div>
         <div className="absolute top-1/2 left-5 w-12 h-12 bg-green-200 rounded-full opacity-20 animate-pulse" style={{animationDelay: '2s'}}></div>

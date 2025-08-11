@@ -7,28 +7,34 @@ import Lead from '../sections/Lead'
 import Campaign from '../sections/Campaign'
 import MarketAnalysis from '../sections/marketAnalysis'
 import Settings from '../sections/Settings'
-import EmailSettingsComponent from '../EmailSettings'
-
+import Communication from '../sections/Communication'
+import Projects from '../sections/Projects'
+import { useEffect } from 'react'
+import { useSelector, UseSelector } from 'react-redux'
 interface MainContentProps {
-  activeSection: string
   isMobileMenuOpen: boolean
 }
 
-const MainContent = ({ activeSection, isMobileMenuOpen }: MainContentProps) => {
+const MainContent = ({  isMobileMenuOpen }: MainContentProps) => {
+  const value = useSelector((state:any) => state?.section?.value);
+    useEffect(()=>{
+        console.log(value)
+
+    },[])
   const renderSection = () => {
-    switch (activeSection) {
+    switch (value) {
       case 'Dashboard':
         return <Dashboard />
       case 'Onboard':
         return <Onboard />
-      case 'Lead':
-        return <Lead />
+      case 'Projects':
+        return <Projects />
       case 'Campaign':
         return <Campaign />
       case 'MarketAnalysis':
         return <MarketAnalysis />
       case 'Communication Settings':
-        return <EmailSettingsComponent />
+        return <Communication />
       default:
         return <Dashboard />
     }

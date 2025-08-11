@@ -1,4 +1,5 @@
 'use client'
+
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -14,12 +15,12 @@ import {
   MessageCircle
 } from 'lucide-react'
 import { GoOrganization } from "react-icons/go";
-
+import { setsection } from '@/app/redux/sectionslice';
+import { useDispatch, useSelector,  } from 'react-redux';
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
   { name: 'Onboard', icon: UserPlus, color: 'from-green-500 to-emerald-500' },
-  { name: 'Projects', icon: UserPlus, color: 'from-green-500 to-emerald-500' },
-  { name: 'Lead', icon: Users, color: 'from-purple-500 to-pink-500' },
+  { name: 'Projects', icon: Users, color: 'from-purple-500 to-pink-500' },
   { name: 'Campaign', icon: Megaphone, color: 'from-orange-500 to-red-500' },
   { name: 'MarketAnalysis', icon: TrendingUp, color: 'from-indigo-500 to-blue-500' },
   { name: 'Settings', icon: Settings, color: 'from-gray-500 to-slate-600' },
@@ -31,25 +32,26 @@ const settingsSubItems = [
 ]
 
 interface SidebarProps {
-  activeSection: string
-  setActiveSection: (section: string) => void
   isMobileMenuOpen: boolean
   setIsMobileMenuOpen: (open: boolean) => void
 }
 
 const Sidebar = ({ 
-  activeSection, 
-  setActiveSection, 
   isMobileMenuOpen, 
   setIsMobileMenuOpen 
 }: SidebarProps) => {
+    const activeSection=useSelector((state:any)=>{
+       return state?.section?.value
+    })
+    const dispatch=useDispatch()
   const [isSettingsExpanded, setIsSettingsExpanded] = useState(false)
   
   const handleItemClick = (itemName: string) => {
     if (itemName === 'Settings') {
       setIsSettingsExpanded(!isSettingsExpanded)
     } else {
-      setActiveSection(itemName)
+        dispatch(setsection(itemName))
+    //   setActiveSection(itemName)
       setIsSettingsExpanded(false)
     }
 
@@ -59,7 +61,8 @@ const Sidebar = ({
   }
 
   const handleSettingsSubItemClick = (subItemName: string) => {
-    setActiveSection(subItemName)
+    dispatch(setsection(subItemName))
+    // setActiveSection(subItemName)
     
     if (window.innerWidth < 750) {
       setIsMobileMenuOpen(false)
@@ -114,7 +117,7 @@ const Sidebar = ({
                         ? 'text-black' 
                         : 'text-white'
                     }`} />
-                    <span className="font-medium flex-1 text-left">{item.name}</span>
+                    <span className="font-medium text-sm flex-1 text-left">{item.name}</span>
                     {item.name === 'Settings' && (
                       <motion.div
                         initial={{ rotate: 0 }}

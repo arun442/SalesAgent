@@ -38,7 +38,7 @@ export default function LoginPage() {
         throw new Error('Login failed');
       }
       console.log('Login successful:', res.data);
-      localStorage.setItem('token', res.data.token);
+      localStorage.setItem('token', res.data.accessToken);
       localStorage.setItem('email', JSON.stringify(res.data.email));
       localStorage.setItem('roleId', JSON.stringify(res.data.roleId));
       toast.success('Login successful! Redirecting...');

@@ -34,11 +34,11 @@ const Header = ({ onMenuToggle, isMobileMenuOpen }: HeaderProps) => {
             whileHover={{ scale: 1.05 }}
             className="flex items-center space-x-2"
           >
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+            {/* <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">SA</span>
-            </div>
+            </div> */}
             <h1 className="text-xl font-bold gradient-text hidden sm:block">
-              Sales Agent
+              AIA
             </h1>
           </motion.div>
         </div>
