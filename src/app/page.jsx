@@ -1,183 +1,139 @@
-// pages/index.js
-import Head from 'next/head'
-// If you use framer-motion, import it: import { motion } from "framer-motion"
+import Hero from "../components/Landing/Hero";
+import MarketResearch from "../components/Landing/MarketResearch";
+import Footer from "../components/Landing/Footer";
+export const metadata = {
+  title: "Home | AIA - AI Agent",
 
-export default function Home() {
+  description:
+    "Meet AIA — Your Intelligent Business Growth Partner. Empower your business with a collaborative AI Agent system designed to boost growth via market research, leads, and sales outreach.",
+};
+
+export default function Home() {  
   return (
-    <>
-      <Head>
-        <title>SalesAI – Autonomous Pipeline Generation</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
-      <main className="min-h-screen flex flex-col bg-[var(--background)]">
-        {/* Navigation */}
-        <nav className="flex justify-between items-center py-6 px-4 md:px-20 bg-white shadow">
-          <span className="text-2xl font-bold text-[var(--primary)]">SalesAI</span>
-          <ul className="flex gap-8 text-[var(--secondary)] font-semibold">
-            <li><a href="#use-cases" className="hover:text-[var(--accent)] transition">Use Cases</a></li>
-            <li><a href="#features" className="hover:text-[var(--accent)] transition">Features</a></li>
-            <li><a href="#results" className="hover:text-[var(--accent)] transition">Results</a></li>
-            <li><a href="#contact" className="hover:text-[var(--accent)] transition">Contact</a></li>
-            <li><a href="/Login" className="hover:text-[var(--accent)] transition">Login</a></li>
-          </ul>
-        </nav>
-        
-        {/* Hero Section */}
-        <section className="flex flex-col items-center justify-center text-center py-20 px-4 bg-gradient-to-b from-[var(--primary)] to-[var(--secondary)] text-white relative overflow-hidden">
-          {/* Animated background component goes here */}
-          <h1 className="text-4xl md:text-6xl font-extrabold mb-4">Autonomous AI for Outbound Sales</h1>
-          <p className="max-w-xl mb-8 text-lg md:text-xl text-[var(--accent)]">Put your entire pipeline on autopilot. Identify, engage and convert your perfect-fit prospects 24/7, powered by intelligent AI agents.</p>
-          <a href="#demo" className="px-8 py-3 bg-[var(--accent)] text-[var(--secondary)] rounded-lg font-bold text-lg shadow-lg hover:scale-105 transition">Get Started</a>
-          {/* Add animated decorative elements using framer-motion or TailwindCSS */}
-        </section>
-        
-        {/* Use Cases */}
-        <section id="use-cases" className="py-16 bg-[var(--background)] px-4">
-          <h2 className="text-3xl font-bold text-center mb-10 text-[var(--primary)]">Use Cases</h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <Card
-              title="Real-Time Market Tracking"
-              description="Monitor every lead, produce deep research, detect buying signals, and uncover new ideal customers instantly."
-            />
-            <Card
-              title="Account-Based Engagement"
-              description="Engage decision-makers at scale with tailored, multi-channel messaging and dynamic value propositions."
-            />
-            <Card
-              title="Demand Generation"
-              description="Drive registrations, share case studies, and nurture leads across all stakeholders to create interest and urgency."
-            />
-            <Card
-              title="High-Intent Activation"
-              description="Respond immediately to high-intent website visitors or ICP job changers, turning them into opportunities."
-            />
-            <Card
-              title="Lead Revival"
-              description="Breathe new life into old leads, reigniting conversations and uncovering missed revenue hidden in your CRM."
-            />
-            <Card
-              title="International Expansion"
-              description="Enter any market at warp speed with 105+ languages, localizing and adapting your outreach at scale."
-            />
+    <div>
+      <Hero />
+      <div className="bg-white text-black">
+        <section className="max-w-7xl mx-auto px-6 py-20 text-black">
+          <h2 className="text-4xl font-extrabold text-center mb-4 font-poppins">
+            Why Choose AIA?
+          </h2>
+
+          <div className="grid md:grid-cols-3 gap-10 max-w-6xl mx-auto">
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
+              <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white text-2xl shadow-lg">
+                📊
+              </div>
+              <h3 className="text-xl font-semibold mb-3 font-poppins">
+                Comprehensive Market Insights
+              </h3>
+              <p className="text-gray-600 font-roboto">
+                In-depth research tailored to your product and sector for
+                strategic advantage.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
+              <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white text-2xl shadow-lg">
+                🎯
+              </div>
+              <h3 className="text-xl font-semibold mb-3 font-poppins">
+                Targeted Lead Generation
+              </h3>
+              <p className="text-gray-600 font-roboto">
+                Find and prioritize your ideal prospects to maximize conversion
+                potential.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center border border-gray-100 hover:shadow-2xl hover:-translate-y-1 transition duration-300">
+              <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-blue-700 text-white text-2xl shadow-lg">
+                🤖
+              </div>
+              <h3 className="text-xl font-semibold mb-3 font-poppins">
+                Automated Sales Campaigns
+              </h3>
+              <p className="text-gray-600 font-roboto">
+                End-to-end campaign execution from content creation to
+                follow-ups, powered by AI.
+              </p>
+            </div>
           </div>
         </section>
 
-        {/* Features Section */}
-        <section id="features" className="py-16 bg-[var(--surface)] px-4">
-          <h2 className="text-3xl font-bold text-center mb-10 text-[var(--secondary)]">How SalesAI Delivers Pipeline On Autopilot</h2>
-          <div className="max-w-4xl mx-auto flex flex-col gap-14">
-            <Feature
-              title="Intelligent Buyer Targeting"
-              description="Go beyond static data — SalesAI autonomously discovers and books meetings with buyers most likely to convert."
+        <MarketResearch />
+
+        <section
+          id="demo"
+          className="relative overflow-hidden py-10 px-6 text-center font-roboto bg-white"
+        >
+          <svg
+            className="absolute top-0 left-0 w-56 h-56 md:w-72 md:h-72 -translate-x-1/2 -translate-y-1/2 animate-pulse"
+            viewBox="0 0 200 200"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M200 100C200 155.228 155.228 200 100 200C44.7715 200 0 155.228 0 100C0 44.7715 44.7715 0 100 0C155.228 0 200 44.7715 200 100ZM30 100C30 138.66 61.3401 170 100 170C138.66 170 170 138.66 170 100C170 61.3401 138.66 30 100 30C61.3401 30 30 61.3401 30 100Z"
+              fill="url(#grad1)"
             />
-            <Feature
-              title="Adaptive Personalization"
-              description="No more templates. Each message is crafted with real prospect research and self-improving outreach logic."
+            <defs>
+              <linearGradient
+                id="grad1"
+                x1="0"
+                y1="0"
+                x2="200"
+                y2="200"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#A855F7" />
+                <stop offset="1" stopColor="#6366F1" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <svg
+            className="absolute bottom-0 right-0 w-56 h-56 md:w-72 md:h-72 translate-x-1/2 translate-y-1/2 animate-pulse"
+            viewBox="0 0 200 200"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M200 100C200 155.228 155.228 200 100 200C44.7715 200 0 155.228 0 100C0 44.7715 44.7715 0 100 0C155.228 0 200 44.7715 200 100ZM30 100C30 138.66 61.3401 170 100 170C138.66 170 170 138.66 170 100C170 61.3401 138.66 30 100 30C61.3401 30 30 61.3401 30 100Z"
+              fill="url(#grad2)"
             />
-            <Feature
-              title="Relentless Execution"
-              description="24/7 prospecting, learning on every action to fill your calendar with qualified meetings."
-            />
-            <Feature
-              title="Precision Conversation"
-              description="Dynamically adapts tone, content and timing for every prospect, maximizing response and conversion rates."
-            />
-            <Feature
-              title="Multi-Channel Engagement"
-              description="Reaches buyers across all channels—from emails to calls—in perfectly sequenced campaigns."
-            />
-            <Feature
-              title="Seamless CRM Sync"
-              description="Effortlessly enriches, deduplicates, and auto-qualifies leads across your revenue stack."
-            />
+            <defs>
+              <linearGradient
+                id="grad2"
+                x1="0"
+                y1="0"
+                x2="200"
+                y2="200"
+                gradientUnits="userSpaceOnUse"
+              >
+                <stop stopColor="#A855F7" />
+                <stop offset="1" stopColor="#6366F1" />
+              </linearGradient>
+            </defs>
+          </svg>
+
+          <div className="relative z-10 max-w-2xl mx-auto">
+            <span className="inline-block text-sm font-medium text-purple-600 bg-purple-100 px-3 py-1 rounded-full mb-4"></span>
+            <h2 className="text-4xl md:text-5xl font-extrabold text-black mb-4 font-poppins">
+              Interested in AIA?
+            </h2>
+            <p className="text-gray-700 mb-8 max-w-xl mx-auto">
+              Request a personalized demo to see how AIA can grow your business.{" "}
+            </p>
+            <a
+              href="/About"
+              className="inline-block bg-gradient-to-r cursor-pointer from-purple-500 to-indigo-500 text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition"
+            >
+              Request Demo
+            </a>
           </div>
         </section>
-        
-        {/* Results Section */}
-        <section id="results" className="py-16 bg-[var(--background)] px-4">
-          <h2 className="text-3xl font-bold text-center mb-10 text-[var(--primary)]">Alice's Average Results</h2>
-          <div className="flex flex-wrap gap-8 justify-center">
-            <Stat amount="11x" label="More Pipeline" />
-            <Stat amount="24/7" label="Prospecting" />
-            <Stat amount="$500k+" label="Annual Hiring Savings" />
-            <Stat amount="10x" label="Lead Personalization" />
-          </div>
-        </section>
-        
-        {/* Testimonials Section */}
-        <section className="py-16 bg-[var(--surface)] px-4">
-          <h2 className="text-3xl font-bold text-center mb-10 text-[var(--secondary)]">Customer Love</h2>
-          <div className="max-w-3xl mx-auto flex flex-col gap-10">
-            <Testimonial
-              name="Johan De Picker"
-              company="KMS Healthcare"
-              text="I was a skeptic, but SalesAI blew me away by booking meetings that beat our best SDRs—at 11x the scale!"
-            />
-            <Testimonial
-              name="Anjali S."
-              company="FinServe Corp"
-              text="Onboarding was smooth and intuitive. We saw pipeline grow week-over-week, all on autopilot."
-            />
-            <Testimonial
-              name="Derek S."
-              company="CloudStart"
-              text="Efficient, always-on workflows that seamlessly align with business goals. Highly recommended!"
-            />
-          </div>
-        </section>
-
-        {/* Contact/CTA */}
-        <section id="contact" className="flex flex-col items-center justify-center py-20 px-4 bg-[var(--primary)] text-white">
-          <h2 className="text-3xl font-bold mb-4">Ready to Autopilot Sales?</h2>
-          <p className="text-lg mb-8 text-[var(--accent)] max-w-md text-center">
-            Experience the next generation of outbound. Book a demo or get started today.
-          </p>
-          <a href="#demo" className="px-8 py-3 bg-[var(--accent)] text-[var(--secondary)] rounded-lg font-bold text-lg shadow-lg hover:scale-105 transition">Book Demo</a>
-        </section>
-
-        {/* Footer */}
-        <footer className="text-center py-6 bg-[var(--secondary)] text-[var(--accent)] mt-auto">
-          &copy; {new Date().getFullYear()} SalesAI. All rights reserved.
-        </footer>
-      </main>
-    </>
-  );
-}
-
-// Helper Components
-function Card({ title, description }) {
-  return (
-    <div className="bg-white/90 rounded-xl shadow-lg p-8 min-h-[190px] flex flex-col gap-3 hover:scale-105 transition">
-      <h3 className="font-bold text-xl mb-2 text-[var(--primary)]">{title}</h3>
-      <p className="text-[var(--secondary)]">{description}</p>
-    </div>
-  );
-}
-
-function Feature({ title, description }) {
-  return (
-    <div className="p-6 bg-white rounded-lg shadow flex flex-col gap-2 hover:bg-[var(--background)] transition">
-      <h4 className="font-semibold text-lg text-[var(--secondary)]">{title}</h4>
-      <p className="text-[var(--primary)] text-base">{description}</p>
-    </div>
-  );
-}
-
-function Stat({ amount, label }) {
-  return (
-    <div className="bg-[var(--surface)] rounded-xl px-8 py-6 text-center shadow ">
-      <span className="text-3xl font-bold text-[var(--primary)]">{amount}</span>
-      <div className="text-[var(--secondary)] mt-1">{label}</div>
-    </div>
-  );
-}
-
-function Testimonial({ name, company, text }) {
-  return (
-    <div className="bg-white rounded-xl shadow-lg p-6 text-[var(--secondary)]">
-      <p className="italic mb-3">"{text}"</p>
-      <div className="text-[var(--primary)] font-bold">{name}</div>
-      <div className="text-[var(--accent)] font-medium">{company}</div>
+        <Footer />
+      </div>
     </div>
   );
 }

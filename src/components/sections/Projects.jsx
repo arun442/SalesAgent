@@ -3,11 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Eye, Search, Filter, Calendar, Building2, CheckCircle, Clock, AlertCircle, X, ChevronDown, ChevronUp, Play, Target, Users, Mail, Package, Star, DollarSign, UserCheck, ArrowLeft } from 'lucide-react';
 import { axiosPublic } from '@/app/api/constant';
 import { toast } from 'react-toastify';
+import { useRouter } from "next/navigation";
 
 export default function ProjectsList() {
     const [projects, setProjects] = useState([]);
+    const router = useRouter();
 
-    useEffect(() => {
+    function getProjectDetails(){
         axiosPublic.get("project/getProjects")
             .then(res => {
                 setProjects(res.data);
@@ -15,6 +17,10 @@ export default function ProjectsList() {
             .catch(err => {
                 console.error('Error fetching projects:', err);
             })
+    }
+
+    useEffect(() => {
+        getProjectDetails();
     }, []);
 
     const [showViewModal, setShowViewModal] = useState(false);
@@ -48,10 +54,15 @@ export default function ProjectsList() {
         customerPersona: ''
     });
 
+
+
     useEffect(() => {
         axiosPublic.get("project/getOrg")
             .then(res => {
                 setOrganizations(res.data)
+            })
+            .catch(err =>{
+                console.log(err);
             })
     }, []);
 
@@ -151,9 +162,6 @@ export default function ProjectsList() {
             };
 
             console.log('Submitting project data:', projectData);
-
-            debugger;
-
             // API call
             await axiosPublic.post('project/create-project', projectData)
                 .then(res => {
@@ -170,7 +178,9 @@ export default function ProjectsList() {
                             emailOutreach: false,
                             tracking: false
                         });
+                        getProjectDetails();
                         setShowAddForm(false);
+                       
                     }
                 })
         } catch (error) {
@@ -207,8 +217,7 @@ export default function ProjectsList() {
     };
 
     const handleViewProject = (project) => {
-        setSelectedProject(project);
-        setShowViewModal(true);
+        router.push(`/Projects?execId=${project.execid}&step=${project.status}`)
     };
 
     const toggleOrgCollapse = (org) => {
@@ -255,68 +264,6 @@ export default function ProjectsList() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 lg:p-4">
-            <style jsx>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideInLeft {
-          from { opacity: 0; transform: translateX(-20px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes fadeOut {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-        @keyframes slideDown {
-          from { opacity: 0; transform: translateY(-30px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes slideUp {
-          from { opacity: 1; transform: translateY(0); }
-          to { opacity: 0; transform: translateY(-30px); }
-        }
-        .fade-in-up { animation: fadeInUp 0.6s ease-out; }
-        .slide-in-left { animation: slideInLeft 0.4s ease-out; }
-        .scale-in { animation: scaleIn 0.3s ease-out; }
-        .fade-in { animation: fadeIn 0.5s ease-out; }
-        .fade-out { animation: fadeOut 0.5s ease-out; }
-        .slide-down { animation: slideDown 0.5s ease-out; }
-        .slide-up { animation: slideUp 0.5s ease-out; }
-        .corner-accent {
-          position: relative;
-        }
-        .corner-accent::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 50px;
-          height: 50px;
-          border-top: 3px solid #3b82f6;
-          border-left: 3px solid #3b82f6;
-          border-top-left-radius: 8px;
-        }
-        .corner-accent::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          right: 0;
-          width: 50px;
-          height: 50px;
-          border-bottom: 3px solid #3b82f6;
-          border-right: 3px solid #3b82f6;
-          border-bottom-right-radius: 8px;
-        }
-      `}</style>
 
             <div className="max-w-7xl mx-auto">
                 {/* Header */}
@@ -410,7 +357,7 @@ export default function ProjectsList() {
                                             <option value="" disabled>Select a product</option>
                                             {products.map((product, index) => (
                                                 <option key={index} value={product.product_id}>
-                                                    {product.product_id}
+                                                    {product.product_name}
                                                 </option>
                                             ))}
                                         </select>
@@ -515,7 +462,7 @@ export default function ProjectsList() {
                                 className="flex-1 px-6 py-3 text-sm bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
                             >
                                 <CheckCircle className="w-4 h-4 mr-2" />
-                                Submit Project
+                                Create Project
                             </button>
                         </div>
                     </div>
@@ -853,6 +800,9 @@ export default function ProjectsList() {
                                             placeholder="Describe your ideal customer profile..."
                                         />
                                     </div>
+                                </div>
+                                <div>
+                                    <span className='text-xs font-bold bg-blue-500 p-1 text-white'> Note : This product will be added to your existing organization products</span>
                                 </div>
 
                                 {/* Action Buttons */}

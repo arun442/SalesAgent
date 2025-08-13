@@ -14,30 +14,28 @@ export default function OAuthCallback() {
   useEffect(() => {
     // Extract URL parameters
     const urlParams = new URLSearchParams(window.location.search);
-    const code = urlParams.get('code');
-        const states = urlParams.get('state');
-    const sessionState = urlParams.get('session_state');
+        const states = urlParams.get('provider');
+    const status = urlParams.get('status');
 
     // Simulate OAuth processing
     const processOAuth = async () => {
+      
       try {
         // Simulate API call delay
         await new Promise(resolve => setTimeout(resolve, 2000));
         
-        if (code && states) {
-          const decoded = Buffer.from(states, 'base64').toString('utf8');
-      const stateObj = JSON.parse(decoded);
-      setstate(stateObj)
-      console.log(stateObj);
-      
-          setStatus(stateObj.status); 
+        if (states) {
+    console.log(states,status);
+    
+      setstate(states)
+          setStatus(status); 
           // Start countdown for auto-redirect
           const timer = setInterval(() => {
             setCountdown(prev => {
               if (prev <= 1) {
                 clearInterval(timer);
                 // dispatch(setsection('Communication Settings'))
-if (stateObj.status=='success') {
+if (status=='success') {
                   router.push('/Home')
 }
                 
@@ -78,7 +76,7 @@ if (stateObj.status=='success') {
                 Completing Sign In
               </h1>
               <p className="text-gray-600 mb-6">
-                Please wait while we securely process your {state.email_provider} authentication...
+                Please wait while we securely process your {state} authentication...
               </p>
               <div className="flex justify-center">
                 <div className="flex space-x-2">
@@ -102,7 +100,7 @@ if (stateObj.status=='success') {
                 Welcome Back!
               </h1>
               <p className="text-gray-600 mb-6">
-                You've successfully configure in with {state.email_provider}. Redirecting to your dashboard in {countdown} seconds...
+                You've successfully configure in with {state}. Redirecting to your dashboard in {countdown} seconds...
               </p>
               
               <button
@@ -124,7 +122,7 @@ if (stateObj.status=='success') {
                 Authentication Failed
               </h1>
               <p className="text-gray-600 mb-6">
-                There was an issue processing your {state.email_provider} configure. Please try again.
+                There was an issue processing your {state} configure. Please try again.
               </p>
               
               <div className="space-y-3">
@@ -148,7 +146,7 @@ if (stateObj.status=='success') {
         {/* Footer */}
         <div className="text-center mt-6">
           <p className="text-sm text-gray-500">
-            Secured by {state.email_provider} OAuth 2.0
+            Secured by {state} OAuth 2.0
           </p>
         </div>
 

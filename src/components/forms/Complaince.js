@@ -114,7 +114,7 @@ const ComplianceSettingsForm = () => {
           className={`${field.colSpan} transition-all duration-300 animate-fade-in-up`}
           style={{ animationDelay: `${index * 100 + 600}ms` }}
         >
-          <label className="block text-xs mb-2">
+          <label className="block text-sm mb-2">
             {field.label}
           </label>
 
@@ -124,9 +124,9 @@ const ComplianceSettingsForm = () => {
                 type="checkbox"
                 checked={getFieldValue(field.key, field.defaultValue)}
                 onChange={(e) => handleInputChange(field.key, e.target.checked)}
-                className="w-5 h-5"
+                className="w-5 h-5 text-xs"
               />
-              <span className="text-sm">{field.label}</span>
+              <span className="text-xs">{field.label}</span>
             </div>
           ) : (
             <input
@@ -134,7 +134,7 @@ const ComplianceSettingsForm = () => {
               value={getFieldValue(field.key, field.defaultValue)}
               onChange={(e) => handleInputChange(field.key, e.target.value)}
               placeholder={field.placeholder}
-              className="w-full px-4 py-2 placeholder:text-sm backdrop-blur-sm border border-slate-600/50 rounded-xl transition-all duration-300 resize-none"
+              className="w-full px-4 py-2 text-xs placeholder:text-sm backdrop-blur-sm border border-slate-600/50 rounded-xl transition-all duration-300 resize-none"
             />
           )}
         </div>

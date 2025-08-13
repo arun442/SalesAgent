@@ -66,24 +66,24 @@
 
 //   const [formErrors, setFormErrors] = useState({});
 
-  // const validateStep1 = () => {
-  //   const errors = {};
-  //   const data = formData.organizationData || {};
+//   const validateStep1 = () => {
+//     const errors = {};
+//     const data = formData.organizationData || {};
 
-  //   if (!data.company_name?.trim()) {
-  //     errors.company_name = 'Company name is required';
-  //   }
+//     if (!data.company_name?.trim()) {
+//       errors.company_name = 'Company name is required';
+//     }
 
-  //   // const urlRegex = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]{2,}([\/\w\-._~:?#[\]@!$&'()*+,;=]*)?$/;
-  //   // if (!data.company_website?.trim()) {
-  //   //   errors.company_website = 'Company website is required';
-  //   // } else if (!urlRegex.test(data.company_website)) {
-  //   //   errors.company_website = 'Enter a valid website URL';
-  //   // }
+//     // const urlRegex = /^(https?:\/\/)?([\w\-]+\.)+[\w\-]{2,}([\/\w\-._~:?#[\]@!$&'()*+,;=]*)?$/;
+//     // if (!data.company_website?.trim()) {
+//     //   errors.company_website = 'Company website is required';
+//     // } else if (!urlRegex.test(data.company_website)) {
+//     //   errors.company_website = 'Enter a valid website URL';
+//     // }
 
-  //   setFormErrors(errors);
-  //   return Object.keys(errors).length === 0;
-  // };
+//     setFormErrors(errors);
+//     return Object.keys(errors).length === 0;
+//   };
 
 //   const handleNext = async () => {
 //     if (currentStep === 1 && !validateStep1()) return;
@@ -394,19 +394,39 @@ import ProductServices from "../forms/ProductService";
 import CompetitiveContextForm from "../forms/Competetive";
 import Complaince from '../forms/Complaince';
 import { useOnboarding } from "@/app/context/onboardingContext";
+import { toast } from "react-toastify";
+import { axiosPublic } from "@/app/api/constant";
+
 
 export default function OrganizationDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setLoading] = useState(false);
-  const [organizations, setOrganizations] = useState([
-   
-  ]);
+  const [organizations, setOrganizations] = useState([]);
   const {
   formData,
   completeOnboarding,
   resetOnboarding
 } = useOnboarding();
+
+
+async function getOrganizationDetails(){
+  await axiosPublic.get("onboarding/get-organizations",
+      {headers:
+      {Authorization : `Bearer ${localStorage.getItem("token")}`}})
+    .then(res =>{
+      setOrganizations(res.data.organizations);
+    })
+    .catch(err =>{
+      console.log(err);
+    }
+    )
+}
+
+useEffect(()=>{
+ getOrganizationDetails();
+},[]);
+
 
   const steps = [
     {
@@ -499,7 +519,9 @@ export default function OrganizationDashboard() {
 
     completeOnboarding(); 
     resetOnboarding();     
-    setCurrentStep(1);    
+    setCurrentStep(1);  
+    getOrganizationDetails();  
+    setShowAddForm(false);
 
   } catch (error) {
     toast.error("Error submitting onboarding data");
@@ -544,20 +566,19 @@ export default function OrganizationDashboard() {
   };
 
   const OrganizationCard = ({ org }) => (
-    <div className="bg-white rounded-lg shadow-md border border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+    <div className="bg-white rounded-lg shadow-md border corner-accent border-gray-200 p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
+      <div className=" sm:justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <Building2 className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">{org.name}</h3>
-              <p className="text-sm text-gray-500">{org.industry}</p>
+              <h3 className="text-lg font-semibold text-gray-900">{org.company_name}</h3>
             </div>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             <div className="flex items-center gap-2">
               <Globe className="w-4 h-4 text-gray-400" />
               <a href={org.website} target="_blank" rel="noopener noreferrer" 
@@ -573,7 +594,7 @@ export default function OrganizationDashboard() {
               <Calendar className="w-4 h-4 text-gray-400" />
               <span className="text-gray-600">Created {org.createdAt}</span>
             </div>
-          </div>
+          </div> */}
         </div>
         
         <div className="flex gap-2">
@@ -599,7 +620,7 @@ export default function OrganizationDashboard() {
       </p>
       <button
         onClick={() => setShowAddForm(true)}
-        className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+        className="inline-flex items-center text-sm px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
       >
         <Plus className="w-5 h-5 mr-2" />
         Create Organization
@@ -623,7 +644,7 @@ export default function OrganizationDashboard() {
                 </button>
                 <Brain className="w-8 h-8 text-blue-500" />
                 <span className="text-xl font-bold text-gray-900">
-                  AI Sales Agent
+                  Create Organization
                 </span>
               </div>
               <button 
@@ -724,7 +745,7 @@ export default function OrganizationDashboard() {
               <button
                 onClick={handlePrev}
                 disabled={currentStep === 1}
-                className="w-full sm:w-auto flex items-center justify-center text-sm space-x-2 px-6 py-3 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 rounded-xl font-semibold transition-all duration-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full sm:w-auto flex items-center justify-center text-xs space-x-2 px-6 py-3 border border-gray-300 hover:border-gray-400 text-gray-700 hover:text-gray-900 rounded-xl font-semibold transition-all duration-300 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>Previous</span>
@@ -733,7 +754,7 @@ export default function OrganizationDashboard() {
               <button
                 onClick={currentStep === 4 ? handleComplete : handleNext}
                 disabled={isLoading}
-                className="w-full sm:w-auto flex items-center justify-center text-sm space-x-2 px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                className="w-full sm:w-auto flex items-center justify-center text-xs space-x-2 px-8 py-3 bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
               >
                 {isLoading ? (
                   <>
@@ -766,7 +787,7 @@ export default function OrganizationDashboard() {
         <div className={`bg-white rounded-lg shadow-lg border border-gray-200 py-4 px-3 sm:px-6 mb-6 transition-all duration-500 ${showAddForm ? 'opacity-0 transform -translate-y-4' : 'opacity-100 transform translate-y-0'}`}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-lg sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-md sm:text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Organizations Dashboard
               </h1>
               <p className="text-gray-600 mt-1 text-xs sm:text-sm">Manage and track your projects by organization</p>

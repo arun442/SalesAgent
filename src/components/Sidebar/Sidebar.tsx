@@ -21,8 +21,6 @@ const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
   { name: 'Onboard', icon: UserPlus, color: 'from-green-500 to-emerald-500' },
   { name: 'Projects', icon: Users, color: 'from-purple-500 to-pink-500' },
-  { name: 'Campaign', icon: Megaphone, color: 'from-orange-500 to-red-500' },
-  { name: 'MarketAnalysis', icon: TrendingUp, color: 'from-indigo-500 to-blue-500' },
   { name: 'Settings', icon: Settings, color: 'from-gray-500 to-slate-600' },
 ]
 
@@ -91,7 +89,7 @@ const Sidebar = ({
           x: isMobileMenuOpen ? 0 : -280
         }}
         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-        className="fixed left-0 top-13 h-full w-64 glass-effect border-r bg-gradient-to-t from-indigo-500 to-blue-500 border-white/20 z-50"
+        className="fixed left-0 top-13 h-full w-60 glass-effect border-r bg-[#0056D2] border-white/20 z-50"
       >
         <div className="p-4 h-full overflow-y-auto">
           <nav className="space-y-2">
@@ -117,7 +115,7 @@ const Sidebar = ({
                         ? 'text-black' 
                         : 'text-white'
                     }`} />
-                    <span className="font-medium text-sm flex-1 text-left">{item.name}</span>
+                    <span className="text-xs flex-1 text-left">{item.name}</span>
                     {item.name === 'Settings' && (
                       <motion.div
                         initial={{ rotate: 0 }}

@@ -41,6 +41,7 @@ export default function LoginPage() {
       localStorage.setItem('token', res.data.accessToken);
       localStorage.setItem('email', JSON.stringify(res.data.email));
       localStorage.setItem('roleId', JSON.stringify(res.data.roleId));
+      localStorage.setItem('orgId', JSON.stringify(res.data.org_id));
       toast.success('Login successful! Redirecting...');
       router.push('/Home');
     })

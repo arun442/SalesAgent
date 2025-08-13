@@ -54,7 +54,7 @@ const CompanyForm = ({ errors = {} }) => {
   return (
     <div className='space-y-6'>
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Competitive Context</h2>
+        <h2 className="text-sm font-semibold">Competitive Context</h2>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-black">
@@ -68,7 +68,7 @@ const CompanyForm = ({ errors = {} }) => {
               className={`${field.colSpan} transition-all duration-300  animate-fade-in-up`}
               style={{ animationDelay: `${index * 100 + 600}ms` }}
             >
-              <label className="block text-xs mb-2">
+              <label className="block text-sm mb-2">
                 {field.label}
                 {field.required && <span className="text-red-400 ml-1">*</span>}
               </label>
@@ -78,7 +78,7 @@ const CompanyForm = ({ errors = {} }) => {
                 onChange={(e) => handleInputChange(field.key, e.target.value)}
                 onBlur={(e) => handleBlur(field.key, e.target.value)}
                 placeholder={field.placeholder}
-                className={`w-full px-4 py-2 placeholder:text-sm backdrop-blur-sm border rounded-xl transition-all duration-300 resize-none ${
+                className={`w-full px-4 py-2 text-xs placeholder:text-sm backdrop-blur-sm border rounded-xl transition-all duration-300 resize-none ${
                   error ? 'border-red-500' : 'border-slate-600/50'
                 }`}
               />

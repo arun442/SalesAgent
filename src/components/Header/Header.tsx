@@ -1,7 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Menu, X, Coins, Bell, User } from 'lucide-react'
+import { Menu, X, Coins, Bell, User } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
   onMenuToggle: () => void
@@ -9,6 +10,7 @@ interface HeaderProps {
 }
 
 const Header = ({ onMenuToggle, isMobileMenuOpen }: HeaderProps) => {
+  const router = useRouter();
   return (
     <motion.header
       initial={{ y: -100, opacity: 0 }}
@@ -37,7 +39,7 @@ const Header = ({ onMenuToggle, isMobileMenuOpen }: HeaderProps) => {
             {/* <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-sm">SA</span>
             </div> */}
-            <h1 className="text-xl font-bold gradient-text hidden sm:block">
+            <h1 className="text-xl font-bold gradient-text hidden sm:block cursor-pointer" onClick={()=>{router.push("/Home")}}>
               AIA
             </h1>
           </motion.div>

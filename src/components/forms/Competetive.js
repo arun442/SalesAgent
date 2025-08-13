@@ -60,7 +60,7 @@ const CompetitiveContextForm = () => {
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Competitive Context</h2>
+        <h2 className="text-sm font-semibold">Competitive Context</h2>
         <button
           onClick={handleAddEntry}
           className="px-4 py-2 text-sm rounded-lg bg-blue-600 text-white hover:bg-blue-700"
@@ -77,13 +77,13 @@ const CompetitiveContextForm = () => {
           >
             {fields.map((field) => (
               <div key={field.key}>
-                <label className="block text-xs mb-2">{field.label}</label>
+                <label className="block text-sm mb-2">{field.label}</label>
                 <input
                   type="text"
                   value={entry[field.key] || ''}
                   onChange={(e) => handleInputChange(idx, field.key, e.target.value)}
                   placeholder={field.placeholder}
-                  className="w-full px-4 py-2 placeholder:text-sm border border-slate-600/50 rounded-xl"
+                  className="w-full px-4 py-2 text-sm placeholder:text-sm border border-slate-600/50 rounded-xl"
                 />
               </div>
             ))}

@@ -2,57 +2,63 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { axiosPublic } from '@/app/api/constant';
-import { Mail, ArrowLeft, User, Eye, EyeOff, Plus, X, Trash2, Calendar, AlertCircle } from 'lucide-react';
+import { Mail, ArrowLeft, User, Eye, EyeOff, Plus, X, Trash2, Calendar, AlertCircle, ChevronDown, Building2, ExternalLink } from 'lucide-react';
 import { FaGoogle, FaMicrosoft } from 'react-icons/fa';
-
-// Dummy API function
-const fetchUserEmails = async () => {
-  // Simulate API call delay
-  await new Promise(resolve => setTimeout(resolve, 800));
-  
-  return [
-    {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john.doe@gmail.com",
-      emailProvider: "google",
-      dateAdded: "2024-01-15"
-    },
-    {
-      id: 2,
-      firstName: "Sarah",
-      lastName: "Wilson",
-      email: "sarah.wilson@outlook.com",
-      emailProvider: "outlook",
-      dateAdded: "2024-01-20"
-    },
-    {
-      id: 3,
-      firstName: "Mike",
-      lastName: "Johnson",
-      email: "mike.j@gmail.com",
-      emailProvider: "google",
-      dateAdded: "2024-01-25"
-    },
-    {
-      id: 4,
-      firstName: "Emily",
-      lastName: "Davis",
-      email: "emily.davis@outlook.com",
-      emailProvider: "outlook",
-      dateAdded: "2024-01-28"
+import { toast } from 'react-toastify';
+import Router from 'next/router';
+import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { setsection } from '@/app/redux/sectionslice';
+// API functions
+const fetchOrganizations = async () => {
+  try {
+    const res = await axiosPublic.get('/onboarding/get-organizations', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+    
+    if (res.status === 200) {
+      return res.data;
     }
-  ];
+  } catch (error) {
+    console.error('Error fetching organizations:', error);
+    throw error;
+  }
+};
+
+const fetchUserEmails = async (orgId) => {
+  try {
+    const res = await axiosPublic.get(`/tracking/getEmailsByClientId/${orgId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+
+    if (res.status === 200) {
+
+      return res.data;
+
+    }
+  } catch (error) {
+    console.error('Error fetching emails:', error);
+    throw error;
+  }
 };
 
 export default function EmailSettingsComponent() {
-  const [currentStep, setCurrentStep] = useState('list'); // 'list', 'provider', 'auth-method', 'manual-form'
+    const router=useRouter()
+    const dispatch=useDispatch()
+  const [currentStep, setCurrentStep] = useState('list');
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [userEmails, setUserEmails] = useState([]);
   const [loading, setLoading] = useState(true);
   const [passwordError, setPasswordError] = useState('');
+  const [organizations, setOrganizations] = useState([]);
+  const [selectedOrg, setSelectedOrg] = useState(null);
+  const [showOrgDropdown, setShowOrgDropdown] = useState(false);
+  const [orgLoading, setOrgLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -62,8 +68,8 @@ export default function EmailSettingsComponent() {
 
   const providers = [
     {
-      id: 'google',
-      name: 'Google',
+      id: 'gmail',
+      name: 'Gmail',
       icon: <FaGoogle className="text-2xl" />,
       color: 'from-red-500 to-orange-500',
       description: 'Connect with Gmail'
@@ -77,21 +83,63 @@ export default function EmailSettingsComponent() {
     }
   ];
 
-  // Load user emails on component mount
+  // Load organizations on component mount
   useEffect(() => {
-    loadUserEmails();
+    loadOrganizations();
   }, []);
 
-  const loadUserEmails = async () => {
-    try {
-      setLoading(true);
-      const emails = await fetchUserEmails();
-      setUserEmails(emails);
-    } catch (error) {
-      console.error('Error loading user emails:', error);
-    } finally {
-      setLoading(false);
+  // Load emails when organization is selected
+  useEffect(() => {
+    if (selectedOrg) {
+      loadUserEmails();
     }
+  }, [selectedOrg]);
+
+  const loadOrganizations = async () => {
+    try {
+      setOrgLoading(true);
+      const orgData = await fetchOrganizations();
+      
+      if (orgData.organizations && orgData.organizations.length > 0) {
+        setOrganizations(orgData.organizations);
+        if (orgData.organizations.length === 1) {
+          setSelectedOrg(orgData.organizations[0]);
+        }
+      } else {
+        setOrganizations([]);
+      }
+            setOrgLoading(false);
+
+    } catch (error) {
+              setOrgLoading(true);
+
+      console.error('Error loading organizations:', error);
+      toast.error(error.response.data.message||'Failed to load organizations');
+    } finally {
+    }
+  };
+
+  const loadUserEmails = async () => {
+    if (!selectedOrg) return;
+    
+    try {
+      const emails = await fetchUserEmails(selectedOrg.org_id);
+                          setLoading(false);
+
+                              setUserEmails(emails);
+
+                    
+    } catch (error) {
+                                setUserEmails([])
+              setLoading(false);
+      console.error('Error loading user emails:', error);
+      toast.error(error.response.data.message||"Error loading user emails");
+    } 
+  };
+
+  const handleOrgSelect = (org) => {
+    setSelectedOrg(org);
+    setShowOrgDropdown(false);
   };
 
   const handleProviderSelect = (provider) => {
@@ -101,8 +149,8 @@ export default function EmailSettingsComponent() {
 
   const handleOAuthRedirect = () => {
     const authUrls = {
-      google: "https://stu.globalknowledgetech.com:8444/auth/google",
-      outlook: "https://stu.globalknowledgetech.com:8444/auth/login"
+      gmail: `https://stu.globalknowledgetech.com:8444/auth/google?client_id=${selectedOrg.org_id}`,
+      outlook: `https://stu.globalknowledgetech.com:8444/auth/login?client_id=${selectedOrg.org_id}`
     };
 
     const redirectUrl = authUrls[selectedProvider.id];
@@ -119,8 +167,7 @@ export default function EmailSettingsComponent() {
   };
 
   const validatePassword = (password, provider) => {
-    if (provider?.id === 'google') {
-      // For Google, check if password is exactly 16 characters
+    if (provider?.id === 'gmail') {
       if (password.length > 0 && password.length < 16) {
         return 'App password must be exactly 16 characters. Please follow the instructions above to generate a proper App password.';
       }
@@ -132,7 +179,6 @@ export default function EmailSettingsComponent() {
   };
 
   const handleFormSubmit = async () => {
-    // Validate password before submitting
     const passwordValidationError = validatePassword(formData.password, selectedProvider);
     if (passwordValidationError) {
       setPasswordError(passwordValidationError);
@@ -141,75 +187,76 @@ export default function EmailSettingsComponent() {
 
     const submitData = {
       ...formData,
+      clientId: selectedOrg.org_id, // Use selected organization ID
       emailProvider: selectedProvider.id,
     };
     
     try {
-         const res = await axiosPublic.post('/tracking/create-email-config', submitData, {
-      headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbElkIjoiZGhhYW51QGV4YW1wbGUuY29tbSIsInJvbGVJZCI6NSwiZmlyc3ROYW1lIjoiRGhhYW51IiwiaWF0IjoxNzU0NDgwNjExLCJleHAiOjE3NTUwODU0MTF9.3Q_vMZKM6N2PzDUQBEdvfwKfMiWShKLg2eFgxlZAn8Q`,
-      },
-    });
-
-    if (res.status==201) {
-            // Your existing API call here
-      console.log('Form submitted:', submitData);
-      
-      // Simulate adding to list
-      const newEmail = {
-        id: userEmails.length + 1,
-        ...formData,
-        emailProvider: selectedProvider.id,
-        dateAdded: new Date().toISOString().split('T')[0]
-      };
-      
-      setUserEmails(prev => [...prev, newEmail]);
-      
-      // Clear form and go back to list
-      setFormData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        password: ''
+      const res = await axiosPublic.post('/tracking/create-email-config', submitData, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
       });
-      setPasswordError('');
-      setCurrentStep('list');
-    }
-  
-      
+
+      if (res.status === 201) {
+        console.log('Form submitted:', submitData);
+        
+        const newEmail = {
+          id: userEmails.length + 1,
+          ...formData,
+          emailProvider: selectedProvider.id,
+          dateAdded: new Date().toISOString().split('T')[0]
+        };
+        
+        toast.success(res.data.message);
+        loadUserEmails()
+        // setUserEmails(prev => [...prev, newEmail]);
+        
+        setFormData({
+          firstName: '',
+          lastName: '',
+          email: '',
+          password: ''
+        });
+        setPasswordError('');
+        setCurrentStep('list');
+      }
     } catch (error) {
+      console.log(error.response?.data?.message);
+      toast.error(error.response?.data?.error || 'Failed to create email configuration');
       console.error("Full error:", error);
     }
   };
 
   const handleDeleteEmail = async (emailId) => {
     try {
-      // Simulate API call for delete
-      await new Promise(resolve => setTimeout(resolve, 300));
-      setUserEmails(prev => prev.filter(email => email.id !== emailId));
+    const res = await axiosPublic.delete(`/tracking/delete-email-config/${emailId}/${selectedOrg.org_id}`)
+if (res.status==200) {
+              setUserEmails(prev => prev.filter(email => email.uuid !== emailId));
+
+}
+      toast.success('Email account removed');
     } catch (error) {
       console.error('Error deleting email:', error);
+      toast.error(error.response.data.message||'Failed to delete email account');
     }
   };
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear password error when user starts typing
     if (field === 'password' && passwordError) {
       setPasswordError('');
     }
   };
 
   const handlePasswordChange = (value) => {
-    // For Google, restrict input to 16 characters max
-    if (selectedProvider?.id === 'google' && value.length > 16) {
-      return; // Don't allow more than 16 characters
+    if (selectedProvider?.id === 'gmail' && value.length > 16) {
+      return;
     }
     
     handleInputChange('password', value);
     
-    // Real-time validation
     const error = validatePassword(value, selectedProvider);
     setPasswordError(error);
   };
@@ -241,6 +288,11 @@ export default function EmailSettingsComponent() {
     return provider ? provider.color : 'from-gray-500 to-gray-600';
   };
 
+  const redirectToOnboard = () => {
+   router.push('/Home')// Adjust the path as needed
+   dispatch(setsection('Onboard'))
+  };
+
   const pageVariants = {
     initial: { opacity: 0, x: 20 },
     in: { opacity: 1, x: 0 },
@@ -253,8 +305,60 @@ export default function EmailSettingsComponent() {
     duration: 0.4
   };
 
+  // Show loading while fetching organizations
+  if (orgLoading) {
+    return (
+      <div className="p-4 flex items-center justify-center">
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8">
+          <div className="flex justify-center items-center py-12">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"
+            />
+            <span className="ml-3 text-gray-600">Loading organizations...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show create organization prompt if no organizations exist
+  if (organizations.length === 0) {
+    return (
+      <div className="p-4 flex items-center justify-center">
+        <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center py-12"
+          >
+            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Building2 className="w-10 h-10 text-blue-600" />
+            </div>
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">No Organizations Found</h3>
+            <p className="text-gray-600 mb-8 max-w-md mx-auto">
+              You need to create an organization before managing email accounts. 
+              Organizations help you organize and manage your email configurations.
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={redirectToOnboard}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 flex items-center space-x-2 mx-auto"
+            >
+              <Building2 className="w-5 h-5" />
+              <span>Create Organization</span>
+              <ExternalLink className="w-4 h-4" />
+            </motion.button>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-4 flex items-center justify-center  ">
+    <div className="p-4 flex items-center justify-center">
       <div className="w-full max-w-2xl">
         <AnimatePresence mode="wait">
           {/* User Email List */}
@@ -268,101 +372,164 @@ export default function EmailSettingsComponent() {
               transition={pageTransition}
               className="bg-white rounded-2xl shadow-xl p-8"
             >
-              <div className="flex items-center justify-between mb-8 space-x-4">
-                <div className="flex items-center space-x-4">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                    className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center"
+              {/* Organization Selector */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Select Organization
+                </label>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowOrgDropdown(!showOrgDropdown)}
+                    className="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-left flex items-center justify-between hover:border-gray-400 transition-colors"
                   >
-                    <Mail className="w-8 h-8 text-white" />
-                  </motion.div>
-                  <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Email Accounts</h1>
-                    <p className="text-gray-600">Manage your connected email accounts</p>
-                  </div>
+                    <div className="flex items-center space-x-3">
+                      <Building2 className="w-5 h-5 text-gray-500" />
+                      <span className="text-gray-900 text-xs">
+                        {selectedOrg ? selectedOrg.company_name : 'Select an organization'}
+                      </span>
+                    </div>
+                    <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${showOrgDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {showOrgDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
+                    >
+                      {organizations.map((org) => (
+                        <button
+                          key={org.org_id}
+                          onClick={() => handleOrgSelect(org)}
+                          className="w-full px-4 py-3 text-xs text-left hover:bg-gray-50 flex items-center space-x-3 first:rounded-t-lg last:rounded-b-lg"
+                        >
+                          <Building2 className="w-4 h-4 text-gray-500" />
+                          <span className="text-gray-900">{org.company_name}</span>
+                          {selectedOrg?.org_id === org.org_id && (
+                            <span className="ml-auto w-2 h-2 bg-blue-500 rounded-full"></span>
+                          )}
+                        </button>
+                      ))}
+                    </motion.div>
+                  )}
                 </div>
-                <motion.button
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.3 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setCurrentStep('provider')}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center space-x-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  <span className="font-semibold">Add</span>
-                </motion.button>
               </div>
 
-              {loading ? (
-                <div className="flex justify-center py-8">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"
-                  />
-                </div>
-              ) : userEmails.length === 0 ? (
+              {/* Main Content - Only show if organization is selected */}
+              {selectedOrg ? (
+                <>
+                  <div className="flex items-center justify-between mb-8 space-x-4">
+                    <div className="flex items-center space-x-4">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
+                        className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center"
+                      >
+                        <Mail className="w-8 h-8 text-white" />
+                      </motion.div>
+                      <div>
+                        <h1 className="text-2xl font-bold text-gray-900">Email Accounts</h1>
+                        <p className="text-gray-600">Manage email accounts for {selectedOrg.company_name}</p>
+                      </div>
+                    </div>
+                    <motion.button
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ delay: 0.3 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setCurrentStep('provider')}
+                      className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center space-x-2"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span className="font-semibold">Add</span>
+                    </motion.button>
+                  </div>
+
+                  {loading ? (
+                    <div className="flex justify-center py-8">
+                      <motion.div
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-8 h-8 border-4 border-blue-500  rounded-full"
+                      />
+                    </div>
+                  ) : userEmails.length === 0 ? (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-center py-12"
+                    >
+                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Mail className="w-10 h-10 text-gray-400" />
+                      </div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No email accounts yet</h3>
+                      <p className="text-gray-600 mb-6">Add your first email account to get started</p>
+                      <button
+                        onClick={() => setCurrentStep('provider')}
+                        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow duration-300"
+                      >
+                        Add Email Account
+                      </button>
+                    </motion.div>
+                  ) : (
+                    <div className="space-y-4">
+                      {userEmails.map((email, index) => (
+                        <motion.div
+                          key={email.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.1 }}
+                          className="bg-gradient-to-r from-white to-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow duration-300"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div className={`w-12 h-12 bg-gradient-to-r ${getProviderColor(email.emailProvider)} rounded-lg flex items-center justify-center text-white`}>
+                                {getProviderIcon(email.emailProvider)}
+                              </div>
+                              <div>
+                                <h3 className="font-semibold text-gray-900">
+                                  {email.firstName} {email.lastName}
+                                </h3>
+                                <p className="text-gray-600">{email.email}</p>
+                                <div className="flex items-center space-x-2 mt-1">
+                                  <Calendar className="w-4 h-4 text-gray-400" />
+                                  <span className="text-sm text-gray-500">
+                                    Added {new Date(email.dateAdded).toLocaleDateString()}
+                                  </span>
+                                  
+                                </div>
+                                                                <p className="text-gray-500">{email.emailProvider}</p>
+
+                              </div>
+                            </div>
+                            <motion.button
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
+                              onClick={() => handleDeleteEmail(email.uuid)}
+                              className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </motion.button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              ) : (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   className="text-center py-12"
                 >
-                  <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Mail className="w-10 h-10 text-gray-400" />
+                  <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Building2 className="w-10 h-10 text-blue-600" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">No email accounts yet</h3>
-                  <p className="text-gray-600 mb-6">Add your first email account to get started</p>
-                  <button
-                    onClick={() => setCurrentStep('provider')}
-                    className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow duration-300"
-                  >
-                    Add Email Account
-                  </button>
+                  <h3 className="text-sm font-semibold text-gray-900 mb-2">Select an Organization</h3>
+                  <p className="text-gray-600 text-xs">Please select an organization from the dropdown above to manage email accounts</p>
                 </motion.div>
-              ) : (
-                <div className="space-y-4">
-                  {userEmails.map((email, index) => (
-                    <motion.div
-                      key={email.id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className="bg-gradient-to-r from-white to-gray-50 rounded-xl p-6 border border-gray-200 hover:shadow-md transition-shadow duration-300"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className={`w-12 h-12 bg-gradient-to-r ${getProviderColor(email.emailProvider)} rounded-lg flex items-center justify-center text-white`}>
-                            {getProviderIcon(email.emailProvider)}
-                          </div>
-                          <div>
-                            <h3 className="font-semibold text-gray-900">
-                              {email.firstName} {email.lastName}
-                            </h3>
-                            <p className="text-gray-600">{email.email}</p>
-                            <div className="flex items-center space-x-2 mt-1">
-                              <Calendar className="w-4 h-4 text-gray-400" />
-                              <span className="text-sm text-gray-500">
-                                Added {new Date(email.dateAdded).toLocaleDateString()}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <motion.button
-                          whileHover={{ scale: 1.1 }}
-                          whileTap={{ scale: 0.9 }}
-                          onClick={() => handleDeleteEmail(email.id)}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
-                        >
-                          <Trash2 className="w-5 h-5" />
-                        </motion.button>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
               )}
             </motion.div>
           )}
@@ -390,7 +557,7 @@ export default function EmailSettingsComponent() {
                   </motion.div>
                   <div>
                     <h1 className="text-2xl font-bold text-gray-900">Email Settings</h1>
-                    <p className="text-gray-600">Choose your email provider to get started</p>
+                    <p className="text-gray-600">Choose your email provider for {selectedOrg?.company_name}</p>
                   </div>
                 </div>
                 <motion.button
@@ -450,7 +617,7 @@ export default function EmailSettingsComponent() {
                 </button>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">Connect {selectedProvider?.name}</h1>
-                  <p className="text-gray-600 text-sm">Choose how you'd like to connect</p>
+                  <p className="text-gray-600 text-sm">Choose how you'd like to connect for {selectedOrg?.company_name}</p>
                 </div>
               </div>
 
@@ -518,11 +685,11 @@ export default function EmailSettingsComponent() {
                 </button>
                 <div>
                   <h1 className="text-xl font-bold text-gray-900">Manual Setup</h1>
-                  <p className="text-gray-600 text-sm">Enter your {selectedProvider?.name} credentials</p>
+                  <p className="text-gray-600 text-sm">Enter your {selectedProvider?.name} credentials for {selectedOrg?.company_name}</p>
                 </div>
               </div>
 
-              {selectedProvider?.name === "Google" && (
+              {selectedProvider?.name === "Gmail" && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -536,7 +703,7 @@ export default function EmailSettingsComponent() {
                     <div className="text-sm text-blue-800">
                       <p className="font-medium mb-2">To connect your {selectedProvider?.name} account:</p>
                       <ol className="space-y-1 text-blue-700">
-                        <li>1. Go to your Google Account's <span className="font-medium text-blue-600">Security Settings</span></li>
+                        <li>1. Go to your Gmail Account's <span className="font-medium text-blue-600">Security Settings</span></li>
                         <li>2. Enable <span className="font-medium text-blue-600">2-step verification</span></li>
                         <li>3. Create an <span className="font-medium text-blue-600">App password</span> (exactly 16 characters)</li>
                         <li className="text-xs text-blue-600 mt-1">Select 'Other' for both App and Device</li>
@@ -609,7 +776,7 @@ export default function EmailSettingsComponent() {
                   transition={{ delay: 0.4 }}
                 >
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {selectedProvider?.id === 'google' ? 'App Password (16 characters)' : 'Password'}
+                    {selectedProvider?.id === 'gmail' ? 'App Password (16 characters)' : 'Password'}
                   </label>
                   <div className="relative">
                     <input
@@ -621,7 +788,7 @@ export default function EmailSettingsComponent() {
                           ? 'border-red-300 focus:ring-2 focus:ring-red-500 focus:border-transparent' 
                           : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
                       }`}
-                      placeholder={selectedProvider?.id === 'google' ? 'Enter 16-character app password' : 'Enter your password'}
+                      placeholder={selectedProvider?.id === 'gmail' ? 'Enter 16-character app password' : 'Enter your password'}
                       required
                     />
                     <button
@@ -637,8 +804,7 @@ export default function EmailSettingsComponent() {
                     </button>
                   </div>
                   
-                  {/* Password counter for Google */}
-                  {selectedProvider?.id === 'google' && (
+                  {selectedProvider?.id === 'gmail' && (
                     <div className="flex justify-between items-center mt-1">
                       <span className={`text-xs ${
                         formData.password.length === 16 
@@ -679,9 +845,9 @@ export default function EmailSettingsComponent() {
                   whileTap={{ scale: 0.98 }}
                   type="button"
                   onClick={handleFormSubmit}
-                  disabled={passwordError || (selectedProvider?.id === 'google' && formData.password.length !== 16)}
+                  disabled={passwordError || (selectedProvider?.id === 'gmail' && formData.password.length !== 16)}
                   className={`w-full py-3 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${
-                    passwordError || (selectedProvider?.id === 'google' && formData.password.length !== 16)
+                    passwordError || (selectedProvider?.id === 'gmail' && formData.password.length !== 16)
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : `bg-gradient-to-r ${selectedProvider?.color} text-white`
                   }`}
