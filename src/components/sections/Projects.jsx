@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Eye, Search, Filter, Calendar, Building2, CheckCircle, Clock, AlertCircle, X, ChevronDown, ChevronUp, Play, Target, Users, Mail, Package, Star, DollarSign, UserCheck, ArrowLeft } from 'lucide-react';
+import { Plus, Eye, Search, Filter, Calendar, Building2, CheckCircle, Clock, AlertCircle, X, ChevronDown, ChevronUp, Play, Target, Users, Mail, Package, Star, DollarSign, UserCheck, ArrowLeft, Tag, Snowflake, CalendarDays, Timer } from 'lucide-react';
 import { axiosPublic } from '@/app/api/constant';
 import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation";
@@ -9,7 +9,7 @@ export default function ProjectsList() {
     const [projects, setProjects] = useState([]);
     const router = useRouter();
 
-    function getProjectDetails(){
+    function getProjectDetails() {
         axiosPublic.get("project/getProjects")
             .then(res => {
                 setProjects(res.data);
@@ -41,7 +41,12 @@ export default function ProjectsList() {
         leadGeneration: false,
         content: false,
         emailOutreach: false,
-        tracking: false
+        tracking: false,
+        campaign_name : "",
+        seasonal_campaign : false,
+        season_name : "",
+        start_date : new Date(),
+        end_date : ""
     });
 
     const [newProduct, setNewProduct] = useState({
@@ -61,7 +66,7 @@ export default function ProjectsList() {
             .then(res => {
                 setOrganizations(res.data)
             })
-            .catch(err =>{
+            .catch(err => {
                 console.log(err);
             })
     }, []);
@@ -146,48 +151,134 @@ export default function ProjectsList() {
         }
     };
 
-    const handleSubmitProject = async () => {
-        try {
-            // Prepare data for API call
-            const projectData = {
-                org_id: newProject.organization,
-                product_id: newProject.product,
-                additional_info: newProject.additionalInfo,
-                market_research: newProject.marketResearch ? 'manual' : 'auto',
-                lead_gen: newProject.leadGeneration ? 'manual' : 'auto',
-                content: newProject.content ? 'manual' : 'auto',
-                outreach: newProject.emailOutreach ? 'manual' : 'auto',
-                tracking: newProject.tracking ? 'manual' : 'auto',
-                status: "active"
-            };
+   const handleSubmitProject = async () => {
+    try {
+        // Validation function to check required fields
+        const validateFields = () => {
+            const errors = [];
+            
+            // Check required fields
+            if (!newProject.organization) {
+                errors.push('Organization is required');
+            }
+            
+            if (!newProject.product) {
+                errors.push('Product is required');
+            }
+            
+            if (!newProject.campaign_name) {
+                errors.push('Campaign Name is required');
+            }
+            
+            if (!newProject.start_date) {
+                errors.push('Start Date is required');
+            }
+            
+            if (!newProject.end_date) {
+                errors.push('End Date is required');
+            }
+            
+            // Check if seasonal campaign is selected but season name is missing
+            if (newProject.seasonal_campaign && !newProject.season_name) {
+                errors.push('Season Name is required for seasonal campaigns');
+            }
+            
+            // Validate date range (start date should be before or equal to end date)
+            if (newProject.start_date && newProject.end_date) {
+                const startDate = new Date(newProject.start_date);
+                const endDate = new Date(newProject.end_date);
+                
+                if (startDate > endDate) {
+                    errors.push('Start Date must be before or equal to End Date');
+                }
+                
+                // Optional: Check if start date is not in the past
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (startDate < today) {
+                    errors.push('Start Date cannot be in the past');
+                }
+            }
+            
+            return errors;
+        };
 
-            console.log('Submitting project data:', projectData);
-            // API call
-            await axiosPublic.post('project/create-project', projectData)
-                .then(res => {
-                    if (res.status === 201) {
-                        toast.success('Project submitted successfully!');
-                        // Reset form and hide
-                        setNewProject({
-                            organization: '',
-                            product: '',
-                            additionalInfo: '',
-                            marketResearch: false,
-                            leadGeneration: false,
-                            content: false,
-                            emailOutreach: false,
-                            tracking: false
-                        });
-                        getProjectDetails();
-                        setShowAddForm(false);
-                       
-                    }
-                })
-        } catch (error) {
-            console.error('Error submitting project:', error);
+        // Validate all fields
+        const validationErrors = validateFields();
+        
+        if (validationErrors.length > 0) {
+            // Show all validation errors
+            validationErrors.forEach(error => {
+                toast.error(error);
+            });
+            return; // Stop execution if validation fails
+        }
+
+        // Prepare data for API call
+        const projectData = {
+            org_id: newProject.organization,
+            product_id: newProject.product,
+            additional_info: newProject.additionalInfo || '', // Default to empty string if undefined
+            market_research: newProject.marketResearch ? 'manual' : 'auto',
+            lead_gen: newProject.leadGeneration ? 'manual' : 'auto',
+            content: newProject.content ? 'manual' : 'auto',
+            outreach: newProject.emailOutreach ? 'manual' : 'auto',
+            tracking: newProject.tracking ? 'manual' : 'auto',
+            status: "active",
+            campaign_name: newProject.campaign_name,
+            seasonal_campaign: newProject.seasonal_campaign,
+            season_name: newProject.seasonal_campaign ? newProject.season_name : null, // Only include if seasonal
+            start_date: newProject.start_date,
+            end_date: newProject.end_date
+        };
+
+        console.log('Submitting project data:', projectData);
+        
+        // API call
+        const response = await axiosPublic.post('project/create-project', projectData);
+        
+        if (response.status === 201) {
+            toast.success('Project submitted successfully!');
+            
+            // Reset form and hide
+            setNewProject({
+                organization: '',
+                product: '',
+                additionalInfo: '',
+                marketResearch: false,
+                leadGeneration: false,
+                content: false,
+                emailOutreach: false,
+                tracking: false,
+                campaign_name: '',
+                seasonal_campaign: false,
+                season_name: '',
+                start_date: '',
+                end_date: ''
+            });
+            
+            getProjectDetails();
+            setShowAddForm(false);
+        }
+        
+    } catch (error) {
+        console.error('Error submitting project:', error);
+        
+        // Handle different types of errors
+        if (error.response) {
+            // Server responded with error status
+            const errorMessage = error.response.data?.message || 'Server error occurred';
+            toast.error(`Error: ${errorMessage}`);
+        } else if (error.request) {
+            // Request was made but no response received
+            toast.error('Network error. Please check your connection.');
+        } else {
+            // Something else happened
             toast.error('Error submitting project. Please try again.');
         }
-    };
+    }
+};
 
     const handleCancelForm = () => {
         setNewProject({
@@ -198,7 +289,12 @@ export default function ProjectsList() {
             leadGeneration: false,
             content: false,
             emailOutreach: false,
-            tracking: false
+            tracking: false,
+            campaign_name: '',
+                seasonal_campaign: false,
+                season_name: '',
+                start_date: '',
+                end_date: ''
         });
         setShowAddForm(false);
     };
@@ -308,10 +404,9 @@ export default function ProjectsList() {
                         </div>
 
                         <div className='flex space-x-6'>
-
                             {/* Organization Selection */}
                             <div className="mb-6 w-full">
-                                <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
+                                <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2 required">
                                     <Building2 className="w-4 h-4 text-blue-500" />
                                     <span>Organization</span>
                                 </label>
@@ -336,7 +431,7 @@ export default function ProjectsList() {
                             {newProject.organization && (
                                 <div className="mb-6 w-full">
                                     <div className="flex items-center justify-between mb-2">
-                                        <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700">
+                                        <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 required">
                                             <Package className="w-4 h-4 text-blue-500" />
                                             <span>Products</span>
                                         </label>
@@ -365,7 +460,101 @@ export default function ProjectsList() {
                                     </div>
                                 </div>
                             )}
+                        </div>
 
+                        {/* Campaign Details Section */}
+                        <div className="mb-6">
+                            <h3 className="text-sm font-semibold text-gray-800 mb-4 flex items-center space-x-2">
+                                <Target className="w-4 h-4 text-purple-500" />
+                                <span>Campaign Details</span>
+                            </h3>
+
+                            {/* Campaign Name */}
+                            <div className="mb-4">
+                                <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2 required">
+                                    <Tag className="w-4 h-4 text-blue-500" />
+                                    <span>Campaign Name</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    value={newProject.campaign_name}
+                                    onChange={(e) => setNewProject({ ...newProject, campaign_name: e.target.value })}
+                                    className="w-full px-4 py-3 border text-xs border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
+                                    placeholder="Enter campaign name..."
+                                />
+                            </div>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                            {/* Seasonal Campaign Toggle */}
+                            <div className="mb-4">
+                                <label className="flex items-center space-x-3 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={newProject.seasonal_campaign}
+                                        onChange={(e) => setNewProject({
+                                            ...newProject,
+                                            seasonal_campaign: e.target.checked,
+                                            // Clear season name if seasonal campaign is unchecked
+                                            season_name: e.target.checked ? newProject.season_name : ''
+                                        })}
+                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+                                    />
+                                    <div className="flex items-center space-x-2">
+                                        <Calendar className="w-4 h-4 text-orange-500" />
+                                        <span className="text-sm font-semibold text-gray-700">Seasonal Campaign</span>
+                                    </div>
+                                </label>
+                            </div>
+
+                            {/* Season Name (Conditional) */}
+                            {newProject.seasonal_campaign && (
+                                <div className="mb-4">
+                                    <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2 required">
+                                        <Snowflake className="w-4 h-4 text-blue-500" />
+                                        <span>Season Name</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={newProject.season_name}
+                                        onChange={(e) => setNewProject({ ...newProject, season_name: e.target.value })}
+                                        className="w-full px-4 py-3 border text-xs border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
+                                        placeholder="e.g., Winter 2024, Holiday Season, Spring Collection..."
+                                    />
+                                </div>
+                            )}
+                            </div>
+
+                            {/* Date Range */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                {/* Start Date */}
+                                <div>
+                                    <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2 required">
+                                        <CalendarDays className="w-4 h-4 text-green-500" />
+                                        <span>Start Date</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={newProject.start_date}
+                                        min={new Date().toISOString().split("T")[0]}
+                                        onChange={(e) => setNewProject({ ...newProject, start_date: e.target.value })}
+                                        className="w-full px-4 py-3 border text-xs border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
+                                    />
+                                </div>
+
+                                {/* End Date */}
+                                <div>
+                                    <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2 required">
+                                        <CalendarDays className="w-4 h-4 text-red-500" />
+                                        <span>End Date</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={newProject.end_date}
+                                        min={newProject.start_date}
+                                        onChange={(e) => setNewProject({ ...newProject, end_date: e.target.value })}
+                                        className="w-full px-4 py-3 border text-xs border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
+                                    />
+                                </div>
+                            </div>
                         </div>
 
                         {/* Additional Info */}
@@ -383,70 +572,6 @@ export default function ProjectsList() {
                             />
                         </div>
 
-                        {/* Wait for Approval Section */}
-                        {/* <div className="mt-4 p-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center space-x-2">
-                                <Clock className="w-5 h-5 text-blue-500" />
-                                <span>Wait for My Approval</span>
-                            </h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={newProject.marketResearch}
-                                        onChange={(e) => setNewProject({ ...newProject, marketResearch: e.target.checked })}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                                    />
-                                    <Target className="w-4 h-4 text-purple-600" />
-                                    <span className="text-sm font-medium text-gray-700">Market Research</span>
-                                </label>
-
-                                <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={newProject.leadGeneration}
-                                        onChange={(e) => setNewProject({ ...newProject, leadGeneration: e.target.checked })}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                                    />
-                                    <Users className="w-4 h-4 text-orange-600" />
-                                    <span className="text-sm font-medium text-gray-700">Lead Generation</span>
-                                </label>
-
-                                <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={newProject.content}
-                                        onChange={(e) => setNewProject({ ...newProject, content: e.target.checked })}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                                    />
-                                    <Package className="w-4 h-4 text-green-600" />
-                                    <span className="text-sm font-medium text-gray-700">Content</span>
-                                </label>
-
-                                <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={newProject.emailOutreach}
-                                        onChange={(e) => setNewProject({ ...newProject, emailOutreach: e.target.checked })}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                                    />
-                                    <Mail className="w-4 h-4 text-indigo-600" />
-                                    <span className="text-sm font-medium text-gray-700">Email Outreach</span>
-                                </label>
-
-                                <label className="flex items-center space-x-3 p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={newProject.tracking}
-                                        onChange={(e) => setNewProject({ ...newProject, tracking: e.target.checked })}
-                                        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-                                    />
-                                    <Eye className="w-4 h-4 text-red-600" />
-                                    <span className="text-sm font-medium text-gray-700">Tracking</span>
-                                </label>
-                            </div>
-                        </div> */}
-
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-8">
                             <button
@@ -458,7 +583,7 @@ export default function ProjectsList() {
                             </button>
                             <button
                                 onClick={handleSubmitProject}
-                                disabled={!newProject.organization || !newProject.product}
+                                // disabled={!newProject.organization || !newProject.product || !newProject.campaign_name || !newProject.start_date || !newProject.end_date}
                                 className="flex-1 px-6 py-3 text-sm bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
                             >
                                 <CheckCircle className="w-4 h-4 mr-2" />
@@ -574,9 +699,20 @@ export default function ProjectsList() {
                                                         <div className="flex items-center text-gray-800 mb-4">
                                                             <Building2 className="w-5 h-5 mr-2 text-blue-500" />
                                                             <h3 className="text-sm font-bold group-hover:text-blue-600 transition-colors duration-300">
-                                                                {project.company_name}
+                                                                {project.campaign_name}
                                                             </h3>
                                                         </div>
+                                                        {project.start_date && project.end_date &&
+                                                        <div className="flex items-center text-gray-800 mb-4">
+                                                            <Timer className="w-5 h-5 mr-2 text-blue-500" />
+                                                            <span className='flex gap-4'>
+                                                            <span className='text-xs'>{project.start_date}</span>
+                                                            <span className='text-xs'>To</span>
+                                                            <span className='text-xs'>{project.end_date}</span>
+                                                            </span>
+                                                        
+                                                        </div>
+                                        }
 
                                                         {/* Current Status/Stage */}
                                                         <div className="flex items-center mb-4">

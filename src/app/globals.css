@@ -100,3 +100,9 @@ body {
           border-right: 3px solid #3b82f6;
           border-bottom-right-radius: 8px;
         }
+
+.required::after{
+  content: "*";
+  color: red;
+  font-size: small;
+}

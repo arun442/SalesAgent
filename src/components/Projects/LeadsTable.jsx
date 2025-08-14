@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, MapPin, Building, Calendar, ExternalLink, Search, Filter } from 'lucide-react';
+import { axiosPublic } from '@/app/api/constant';
  
 const LeadsDashboard = ({execId}) => {
   const [leads, setLeads] = useState([]);
@@ -13,29 +14,19 @@ const LeadsDashboard = ({execId}) => {
   }, []);
  
   const fetchLeads = async () => {
-    try {
+    
       setLoading(true);
-      const response = await fetch(`https://stu.globalknowledgetech.com:8444/api/leads/execution/${execId}`, {
-        method: "GET", // Explicitly set to GET
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      await axiosPublic.get(`api/leads/execution/${execId}`)
+      .then(res =>{
+        const leadsData = res.data || res;
+        setLeads(leadsData);
+      })
+      .catch(err =>{
+        setError(err.response.data.message || "Error while fetching leads data");
+      })
+      .finally(()=>{
+        setLoading(false);
       });
-     
-      if (!response.ok) {
-        throw new Error('Failed to fetch leads');
-      }
-     
-      const result = await response.json();
-     
-      // Extract data array from the API response
-      const leadsData = result.data || result;
-      setLeads(leadsData);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
  
   const filteredLeads = leads.filter(lead => {
@@ -68,7 +59,7 @@ const LeadsDashboard = ({execId}) => {
  
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="h-52 bg-white flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0056D2] mx-auto"></div>
           <p className="text-sm text-black mt-2">Loading leads...</p>
@@ -79,7 +70,7 @@ const LeadsDashboard = ({execId}) => {
  
   if (error) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="h-52 bg-white flex items-center justify-center">
         <div className="text-center">
           <p className="text-sm text-red-500">Error: {error}</p>
           <button

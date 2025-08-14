@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import EmailCampaignSettings from "./EmailCampaignSettings";
 import LeadsTable from './LeadsTable';
+import MarketAnalysis from "./MarketAnalysisReport";
 // import LeadsDashboard from "../Leads/page";
  
 const ProgressStepsPage = ({execId}) => {
@@ -12,9 +13,9 @@ const ProgressStepsPage = ({execId}) => {
       id: "market_research",
       title: "Market Research",
       description: "Analyzing market trends and identifying target opportunities",
-      content:
-        "Conducting comprehensive market analysis to understand customer needs, competitor landscape, and market size. This phase involves data collection, trend analysis, and identifying potential market gaps.",
-      icon: "📊"
+      content : null,
+      icon: "📊",
+      useComponent: true
     },
     {
       id: "lead_gen",
@@ -136,6 +137,7 @@ const ProgressStepsPage = ({execId}) => {
                 <div className="min-h-80 ">
                   {steps[currentStep].id === 'lead_gen' && <LeadsTable execId={execId} />}
                   {steps[currentStep].id === 'campaign_settings' && <EmailCampaignSettings />}
+                  {steps[currentStep].id === 'market_research' && <MarketAnalysis />}
                 </div>
               ) : (
                 <div className="bg-gray-50 rounded-lg p-6 border border-gray-100">

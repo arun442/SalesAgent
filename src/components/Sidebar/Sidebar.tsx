@@ -12,7 +12,8 @@ import {
   ChevronRight,
   MessageSquare,
   Mail,
-  MessageCircle
+  MessageCircle,
+  Layers
 } from 'lucide-react'
 import { GoOrganization } from "react-icons/go";
 import { setsection } from '@/app/redux/sectionslice';
@@ -20,7 +21,7 @@ import { useDispatch, useSelector,  } from 'react-redux';
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, color: 'from-blue-500 to-cyan-500' },
   { name: 'Onboard', icon: UserPlus, color: 'from-green-500 to-emerald-500' },
-  { name: 'Projects', icon: Users, color: 'from-purple-500 to-pink-500' },
+  { name: 'Projects', icon: Layers, color: 'from-purple-500 to-pink-500' },
   { name: 'Settings', icon: Settings, color: 'from-gray-500 to-slate-600' },
 ]
 
