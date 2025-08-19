@@ -1,12 +1,13 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Plus, Eye, Search, Filter, Calendar, Building2, CheckCircle, Clock, AlertCircle, X, ChevronDown, ChevronUp, Play, Target, Users, Mail, Package, Star, DollarSign, UserCheck, ArrowLeft, Tag, Snowflake, CalendarDays, Timer } from 'lucide-react';
+import { Plus, Eye, Search, Filter, Calendar, Building2, CheckCircle, Clock, AlertCircle, X, ChevronDown, ChevronUp, Play, Target, Users, Mail, Package, Star, DollarSign, UserCheck, ArrowLeft, Tag, Snowflake, CalendarDays, Timer, FolderKanban } from 'lucide-react';
 import { axiosPublic } from '@/app/api/constant';
 import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation";
 
 export default function ProjectsList() {
     const [projects, setProjects] = useState([]);
+    const[loading,setLoading] = useState(false);
     const router = useRouter();
 
     function getProjectDetails() {
@@ -126,11 +127,13 @@ export default function ProjectsList() {
             }
             console.log('Submitting product data:', productData);
 
+            const id = toast.loading("Adding product...");
+
             // API call to add new product
             const response = await axiosPublic.post('project/create-product', productData);
 
             if (response.status === 201) {
-                toast.success("product added successfully!");
+                toast.update(id,{render:"product added successfully!",status: "success",autoClose: 3000, isLoading: false});
                 const updatedProducts = await axiosPublic.get(`project/getOrgProd/${newProject.organization}`);
                 setProducts(updatedProducts.data);
                 setNewProduct({
@@ -147,7 +150,7 @@ export default function ProjectsList() {
             }
         } catch (error) {
             console.error('Error adding product:', error);
-            toast.error('Error adding product. Please try again.');
+            toast.update(id,{render:"Error adding product. Please try again.",status: "error",autoClose: 3000, isLoading: false});
         }
     };
 
@@ -215,6 +218,8 @@ export default function ProjectsList() {
             return; // Stop execution if validation fails
         }
 
+        setLoading(true);
+
         // Prepare data for API call
         const projectData = {
             org_id: newProject.organization,
@@ -240,6 +245,14 @@ export default function ProjectsList() {
         
         if (response.status === 201) {
             toast.success('Project submitted successfully!');
+
+            const body = {
+                execid : response.data.project.execid,
+                organizationData : response.data.project.organizationData,
+                productData : response.data.project.productData,
+            }
+
+            axiosPublic.post('project/start-project',body);
             
             // Reset form and hide
             setNewProject({
@@ -277,6 +290,9 @@ export default function ProjectsList() {
             // Something else happened
             toast.error('Error submitting project. Please try again.');
         }
+    }
+    finally{
+        setLoading(false);
     }
 };
 
@@ -359,6 +375,13 @@ export default function ProjectsList() {
     };
 
     return (
+        <>
+        {loading && (
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-60 z-50">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-white mb-4"></div>
+          <div className="text-white text-sm font-bold tracking-widest">Loading...</div>
+        </div>
+      )}
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 p-4 sm:p-6 lg:p-4">
 
             <div className="max-w-7xl mx-auto">
@@ -697,9 +720,9 @@ export default function ProjectsList() {
 
                                                         {/* Company Name */}
                                                         <div className="flex items-center text-gray-800 mb-4">
-                                                            <Building2 className="w-5 h-5 mr-2 text-blue-500" />
+                                                            <FolderKanban className="w-5 h-5 mr-2 text-blue-500" />
                                                             <h3 className="text-sm font-bold group-hover:text-blue-600 transition-colors duration-300">
-                                                                {project.campaign_name}
+                                                                {project.campaign_name || `Project ${projectIndex}`}
                                                             </h3>
                                                         </div>
                                                         {project.start_date && project.end_date &&
@@ -965,5 +988,6 @@ export default function ProjectsList() {
                 </div>
             )}
         </div>
+        </>
     );
 }

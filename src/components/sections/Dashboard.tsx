@@ -80,8 +80,8 @@ const Dashboard = () => {
               whileHover={{ scale: 1.05 }}
               className="glass-effect rounded-xl p-6 card-hover"
             >
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-center">
+                {/* <div>
                   <p className="text-gray-600 text-sm font-medium">{stat.title}</p>
                   <p className="text-2xl font-bold text-gray-900 mt-1">{stat.value}</p>
                   <div className="flex items-center mt-2">
@@ -96,7 +96,7 @@ const Dashboard = () => {
                       {stat.change}
                     </span>
                   </div>
-                </div>
+                </div> */}
                 <div className={`w-12 h-12 bg-gradient-to-r ${stat.color} rounded-lg flex items-center justify-center`}>
                   <Icon className="w-6 h-6 text-white" />
                 </div>
@@ -159,7 +159,7 @@ const Dashboard = () => {
       </div>
 
       {/* Quick Actions */}
-      <motion.div
+      {/* <motion.div
         initial={{ y: 50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.6, duration: 0.5 }}
@@ -178,7 +178,7 @@ const Dashboard = () => {
             </motion.button>
           ))}
         </div>
-      </motion.div>
+      </motion.div> */}
     </div>
   )
 }

@@ -16,6 +16,7 @@ export default function Home() {
   const params = useSearchParams();
 
   const execId = params.get("execId");
+  const curStep = params.get("step");
 
 
 
@@ -42,7 +43,7 @@ export default function Home() {
             setIsMobileMenuOpen={setIsMobileMenuOpen}
           />
         </AnimatePresence> */}
-        <MainContent execId={execId}/>
+        <MainContent execId={execId} step={curStep} />
       </div>
     </div>
   )

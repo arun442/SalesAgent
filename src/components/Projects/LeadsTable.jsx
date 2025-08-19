@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { User, Mail, MapPin, Building, Calendar, ExternalLink, Search, Filter } from 'lucide-react';
 import { axiosPublic } from '@/app/api/constant';
  
-const LeadsDashboard = ({execId}) => {
+const LeadsDashboard = ({execId,curStatus}) => {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,15 +10,17 @@ const LeadsDashboard = ({execId}) => {
   const [filterBy, setFilterBy] = useState('all');
  
   useEffect(() => {
+    if(curStatus !== "Market Research"){
     fetchLeads();
-  }, []);
+    }
+  }, [curStatus]);
  
   const fetchLeads = async () => {
     
       setLoading(true);
       await axiosPublic.get(`api/leads/execution/${execId}`)
       .then(res =>{
-        const leadsData = res.data || res;
+        const leadsData = res.data.data || res.data;
         setLeads(leadsData);
       })
       .catch(err =>{
@@ -56,6 +58,16 @@ const LeadsDashboard = ({execId}) => {
       day: 'numeric'
     });
   };
+
+   if (curStatus === "Market Research") {
+    return (
+      <div className="h-52 bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-lg shadow-sm">
+          <p className="text-sm text-black mt-2">Please wait while we are generating your leads...</p>
+        </div>
+      </div>
+    );
+  }
  
   if (loading) {
     return (

@@ -1,22 +1,27 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Edit3, Settings, Mail, Target, Calendar, Activity } from 'lucide-react';
+import { axiosPublic } from '@/app/api/constant';
+import { toast } from 'react-toastify';
  
-const EmailCampaignSettings = () => {
+const EmailCampaignSettings = ({execId}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [campaignData, setCampaignData] = useState(null);
+  const[data,setdata] = useState(null);
  
   const allDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
  
   const fetchCampaignData = async () => {
     try {
       setLoading(true);
-      const response = await fetch('https://stu.globalknowledgetech.com:8444/campaigns/getbyid?execution_id=15');
+      const response = await fetch(`https://stu.globalknowledgetech.com:8444/campaigns/getbyid?execution_id=${execId}`);
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const apiResult = await response.json();
       const data = apiResult.data;
+
+      setdata(apiResult.data);
  
       const audience = (data.targetAudience && data.targetAudience[0]) ? data.targetAudience[0] : {};
       const types = {};
@@ -128,6 +133,25 @@ const EmailCampaignSettings = () => {
       smtp_config: data.smtp_config || {},
     };
   };
+
+  const handleStartCampagn = async () =>{
+
+    const json = {
+    "campaign_id": data.campaign_id,
+    "execution_id": execId,
+    "client_id": data.client_id,
+    "created_by": data.created_by
+}
+    await axiosPublic.post(`v1/start-campaign`,json)
+    .then(res =>{
+        if(res.status === 201){
+            toast.success("Campaign started successfully");
+        }
+    })
+    .catch(err =>{
+        toast.error("Error while starting campaign");
+    })
+  }
  
   const handleUpdateCampaign = async () => {
     if (!campaignData) return;
@@ -264,6 +288,7 @@ const EmailCampaignSettings = () => {
                   <Edit3 className="h-4 w-4 mr-2" />
                   Edit Campaign
                 </button>
+                
               ) : (
                 <div className="flex gap-3">
                   <button
@@ -280,6 +305,13 @@ const EmailCampaignSettings = () => {
                   </button>
                 </div>
               )}
+              <button
+                  onClick={() => handleStartCampagn()}
+                  className="flex  items-center px-4 py-2 text-xs font-medium text-white bg-[#0056D2] hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
+                >
+                  {/* <Edit3 className="h-4 w-4 mr-2" /> */}
+                  Start Campaign
+                </button>
             </div>
           </div>
         </div>

@@ -1,30 +1,33 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Loader2, Download, FileText } from 'lucide-react';
+import { axiosPublic } from '@/app/api/constant';
  
-const MarketAnalysisReport = () => {
+const MarketAnalysisReport = ({execId,curStatus}) => {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
- 
   useEffect(() => {
+    
     const fetchData = async () => {
-      try {
-        const response = await fetch('https://stu.globalknowledgetech.com:8444/project/sales-report/TESTTEST-f1b6-4155-b95b-c1a73c22851b');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const jsonData = await response.json();
-        setData(jsonData);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
+      
+        await axiosPublic.get(`project/sales-report/32`)
+        .then(res =>{
+            setData(res.data)
+        })
+        .catch(err =>{
+            setError(err.response.data.error || "Error while loading")
+        })
+        .finally(()=>{
+            setLoading(false);
+        });
     };
- 
-    fetchData();
-  }, []);
+   
+        if(curStatus !== "active")
+        {
+        fetchData();
+        }
+  }, [curStatus]);
  
   const cleanText = (text) => {
     if (!text) return '';
@@ -250,10 +253,21 @@ const MarketAnalysisReport = () => {
       printWindow.print();
     }, 250);
   };
+
+
+  if(curStatus === "active"){
+    return (
+      <div className="h-52 bg-gray-50 flex items-center justify-center">
+        <div className="text-center p-8 bg-white rounded-lg shadow-sm">
+          <p className="text-gray-600">Please wait while we are generating market research...</p>
+        </div>
+      </div>
+    );
+  }
  
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-52 bg-gray-50 flex items-center justify-center">
         <div className="text-center bg-white p-8 rounded-lg shadow-sm">
           <Loader2 className="h-8 w-8 animate-spin text-blue-600 mx-auto mb-4" />
           <p className="text-gray-600 font-medium">Loading market analysis...</p>
@@ -264,7 +278,7 @@ const MarketAnalysisReport = () => {
  
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-52 bg-gray-50 flex items-center justify-center">
         <div className="text-center p-8 bg-white border border-red-200 rounded-lg max-w-md shadow-sm">
           <h2 className="font-semibold text-red-800 mb-2">Error Loading Data</h2>
           <p className="text-red-600 mb-4">{error}</p>
@@ -278,10 +292,12 @@ const MarketAnalysisReport = () => {
       </div>
     );
   }
+
+  
  
   if (!data || !data.market_context) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="h-52 bg-gray-50 flex items-center justify-center">
         <div className="text-center p-8 bg-white rounded-lg shadow-sm">
           <p className="text-gray-600">No market data available</p>
         </div>
@@ -292,7 +308,7 @@ const MarketAnalysisReport = () => {
   const sections = parseMarketContext(data.market_context);
  
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="max-h-screen overflow-auto bg-gray-50">
       {/* Article Header */}
       <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 py-4">

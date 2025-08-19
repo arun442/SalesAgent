@@ -70,14 +70,14 @@ export default function EmailSettingsComponent() {
     {
       id: 'gmail',
       name: 'Gmail',
-      icon: <FaGoogle className="text-2xl" />,
+      icon: <FaGoogle className="text-sm" />,
       color: 'from-red-500 to-orange-500',
       description: 'Connect with Gmail'
     },
     {
       id: 'outlook',
       name: 'Microsoft Outlook',
-      icon: <FaMicrosoft className="text-2xl" />,
+      icon: <FaMicrosoft className="text-sm" />,
       color: 'from-blue-600 to-indigo-600',
       description: 'Connect with Outlook'
     }
@@ -280,7 +280,7 @@ if (res.status==200) {
 
   const getProviderIcon = (providerId) => {
     const provider = providers.find(p => p.id === providerId);
-    return provider ? provider.icon : <Mail className="text-lg" />;
+    return provider ? provider.icon : <Mail className="text-xs" />;
   };
 
   const getProviderColor = (providerId) => {
@@ -425,13 +425,13 @@ if (res.status==200) {
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                        className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center"
+                        className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center"
                       >
-                        <Mail className="w-8 h-8 text-white" />
+                        <Mail className="w-3 h-3 text-white" />
                       </motion.div>
                       <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Email Accounts</h1>
-                        <p className="text-gray-600">Manage email accounts for {selectedOrg.company_name}</p>
+                        <h1 className="text-sm font-bold text-gray-900">Email Accounts</h1>
+                        <p className="text-gray-600 text-xs">Manage email accounts for {selectedOrg.company_name}</p>
                       </div>
                     </div>
                     <motion.button
@@ -441,9 +441,9 @@ if (res.status==200) {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       onClick={() => setCurrentStep('provider')}
-                      className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center space-x-2"
+                      className="text-xs bg-gradient-to-r from-green-500 to-emerald-600 text-white p-3 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 flex items-center space-x-2"
                     >
-                      <Plus className="w-5 h-5" />
+                      <Plus className="w-3 h-3" />
                       <span className="font-semibold">Add</span>
                     </motion.button>
                   </div>
@@ -459,16 +459,16 @@ if (res.status==200) {
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="text-center py-12"
+                      className="text-center py-6"
                     >
-                      <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Mail className="w-10 h-10 text-gray-400" />
+                      <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Mail className="w-5 h-5 text-gray-400" />
                       </div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2">No email accounts yet</h3>
-                      <p className="text-gray-600 mb-6">Add your first email account to get started</p>
+                      <h3 className="text-sm font-semibold text-gray-900 mb-2">No email accounts yet</h3>
+                      <p className="text-gray-600 mb-6 text-xs">Add your first email account to get started</p>
                       <button
                         onClick={() => setCurrentStep('provider')}
-                        className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow duration-300"
+                        className="text-sm bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:shadow-lg transition-shadow duration-300"
                       >
                         Add Email Account
                       </button>
@@ -485,22 +485,22 @@ if (res.status==200) {
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
-                              <div className={`w-12 h-12 bg-gradient-to-r ${getProviderColor(email.emailProvider)} rounded-lg flex items-center justify-center text-white`}>
+                              <div className={`w-8 h-8 bg-gradient-to-r ${getProviderColor(email.emailProvider)} rounded-lg flex items-center justify-center text-white`}>
                                 {getProviderIcon(email.emailProvider)}
                               </div>
                               <div>
-                                <h3 className="font-semibold text-gray-900">
+                                <h3 className="font-semibold text-gray-900 text-xs">
                                   {email.firstName} {email.lastName}
                                 </h3>
-                                <p className="text-gray-600">{email.email}</p>
+                                <p className="text-gray-600 text-xs">{email.email}</p>
                                 <div className="flex items-center space-x-2 mt-1">
-                                  <Calendar className="w-4 h-4 text-gray-400" />
-                                  <span className="text-sm text-gray-500">
+                                  <Calendar className="w-3 h-3 text-gray-400" />
+                                  <span className="text-xs text-gray-500">
                                     Added {new Date(email.dateAdded).toLocaleDateString()}
                                   </span>
                                   
                                 </div>
-                                                                <p className="text-gray-500">{email.emailProvider}</p>
+                               <p className="text-gray-500 text-xs">{email.emailProvider}</p>
 
                               </div>
                             </div>
@@ -510,7 +510,7 @@ if (res.status==200) {
                               onClick={() => handleDeleteEmail(email.uuid)}
                               className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors duration-200"
                             >
-                              <Trash2 className="w-5 h-5" />
+                              <Trash2 className="w-4 h-4" />
                             </motion.button>
                           </div>
                         </motion.div>
@@ -551,13 +551,13 @@ if (res.status==200) {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: 0.2, type: 'spring', stiffness: 200 }}
-                    className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center"
+                    className="w-8 h-8 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center"
                   >
-                    <Mail className="w-8 h-8 text-white" />
+                    <Mail className="w-4 h-4 text-white" />
                   </motion.div>
                   <div>
-                    <h1 className="text-2xl font-bold text-gray-900">Email Settings</h1>
-                    <p className="text-gray-600">Choose your email provider for {selectedOrg?.company_name}</p>
+                    <h1 className="text-sm font-bold text-gray-900">Email Settings</h1>
+                    <p className="text-gray-600 text-xs">Choose your email provider for {selectedOrg?.company_name}</p>
                   </div>
                 </div>
                 <motion.button
@@ -569,7 +569,7 @@ if (res.status==200) {
                   onClick={goBack}
                   className="p-3 rounded-xl hover:bg-gray-100 transition-colors duration-200 text-gray-600"
                 >
-                  <X className="w-6 h-6" />
+                  <X className="w-4 h-4" />
                 </motion.button>
               </div>
 
@@ -587,8 +587,8 @@ if (res.status==200) {
                   >
                     <div className="text-white">{provider.icon}</div>
                     <div className="text-left flex-1">
-                      <div className="font-semibold text-lg">{provider.name}</div>
-                      <div className="text-blue-100 text-sm">{provider.description}</div>
+                      <div className="font-semibold text-sm">{provider.name}</div>
+                      <div className="text-blue-100 text-xs">{provider.description}</div>
                     </div>
                     <div className="text-blue-100">→</div>
                   </motion.button>
@@ -616,8 +616,8 @@ if (res.status==200) {
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </button>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Connect {selectedProvider?.name}</h1>
-                  <p className="text-gray-600 text-sm">Choose how you'd like to connect for {selectedOrg?.company_name}</p>
+                  <h1 className="text-sm font-bold text-gray-900">Connect {selectedProvider?.name}</h1>
+                  <p className="text-gray-600 text-xs">Choose how you'd like to connect for {selectedOrg?.company_name}</p>
                 </div>
               </div>
 
@@ -634,8 +634,8 @@ if (res.status==200) {
                   <div className="flex items-center space-x-3">
                     <div className="text-white">{selectedProvider?.icon}</div>
                     <div className="text-left">
-                      <div className="font-semibold">Quick Connect</div>
-                      <div className="text-blue-100 text-sm">Sign in with {selectedProvider?.name}</div>
+                      <div className="font-semibold text-sm">Quick Connect</div>
+                      <div className="text-blue-100 text-xs">Sign in with {selectedProvider?.name}</div>
                     </div>
                   </div>
                   <div className="text-blue-100">→</div>
@@ -652,11 +652,11 @@ if (res.status==200) {
                 >
                   <div className="flex items-center space-x-3">
                     <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <User className="w-5 h-5 text-gray-600" />
+                      <User className="w-4 h-4 text-gray-600" />
                     </div>
                     <div className="text-left">
-                      <div className="font-semibold text-gray-900">Manual Setup</div>
-                      <div className="text-gray-600 text-sm">Enter your credentials manually</div>
+                      <div className="font-semibold text-gray-900 text-sm">Manual Setup</div>
+                      <div className="text-gray-600 text-xs">Enter your credentials manually</div>
                     </div>
                   </div>
                   <div className="text-gray-400">→</div>
@@ -684,8 +684,8 @@ if (res.status==200) {
                   <ArrowLeft className="w-5 h-5 text-gray-600" />
                 </button>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Manual Setup</h1>
-                  <p className="text-gray-600 text-sm">Enter your {selectedProvider?.name} credentials for {selectedOrg?.company_name}</p>
+                  <h1 className="text-sm font-bold text-gray-900">Manual Setup</h1>
+                  <p className="text-gray-600 text-xs">Enter your {selectedProvider?.name} credentials for {selectedOrg?.company_name}</p>
                 </div>
               </div>
 
@@ -700,7 +700,7 @@ if (res.status==200) {
                     <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center mt-0.5">
                       <span className="text-blue-600 text-sm font-semibold">!</span>
                     </div>
-                    <div className="text-sm text-blue-800">
+                    <div className="text-xs text-blue-800">
                       <p className="font-medium mb-2">To connect your {selectedProvider?.name} account:</p>
                       <ol className="space-y-1 text-blue-700">
                         <li>1. Go to your Gmail Account's <span className="font-medium text-blue-600">Security Settings</span></li>
@@ -727,7 +727,7 @@ if (res.status==200) {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => handleInputChange('firstName', e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 text-xs rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       placeholder="John"
                       required
                     />
@@ -745,7 +745,7 @@ if (res.status==200) {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => handleInputChange('lastName', e.target.value)}
-                      className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                      className="w-full px-4 py-3 text-xs rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       placeholder="Doe"
                       required
                     />
@@ -764,7 +764,7 @@ if (res.status==200) {
                     type="email"
                     value={formData.email}
                     onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    className="w-full px-4 py-3 text-xs rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                     placeholder="john@example.com"
                     required
                   />
@@ -783,7 +783,7 @@ if (res.status==200) {
                       type={showPassword ? 'text' : 'password'}
                       value={formData.password}
                       onChange={(e) => handlePasswordChange(e.target.value)}
-                      className={`w-full px-4 py-3 rounded-lg border transition-all duration-200 pr-12 ${
+                      className={`w-full px-4 py-3 text-xs rounded-lg border transition-all duration-200 pr-12 ${
                         passwordError 
                           ? 'border-red-300 focus:ring-2 focus:ring-red-500 focus:border-transparent' 
                           : 'border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent'
@@ -832,7 +832,7 @@ if (res.status==200) {
                       className="mt-2 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-2"
                     >
                       <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-red-700">{passwordError}</span>
+                      <span className="text-xs text-red-700">{passwordError}</span>
                     </motion.div>
                   )}
                 </motion.div>
@@ -846,7 +846,7 @@ if (res.status==200) {
                   type="button"
                   onClick={handleFormSubmit}
                   disabled={passwordError || (selectedProvider?.id === 'gmail' && formData.password.length !== 16)}
-                  className={`w-full py-3 px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${
+                  className={`w-full py-3 text-sm px-6 rounded-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 ${
                     passwordError || (selectedProvider?.id === 'gmail' && formData.password.length !== 16)
                       ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                       : `bg-gradient-to-r ${selectedProvider?.color} text-white`
@@ -860,7 +860,7 @@ if (res.status==200) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.6 }}
-                className="text-center text-gray-500 text-sm mt-4"
+                className="text-center text-gray-500 text-xs mt-4"
               >
                 Your credentials are encrypted and stored securely
               </motion.p>

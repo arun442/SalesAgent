@@ -54,7 +54,7 @@ export default function CommunicationComponent() {
           <motion.h1 
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-3xl font-bold gradient-text mb-2"
+            className="text-md font-bold gradient-text mb-2"
           >
             Communication Settings
           </motion.h1>
@@ -90,7 +90,7 @@ export default function CommunicationComponent() {
                       transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                     />
                   )}
-                  <span className="relative z-10 flex items-center space-x-2">
+                  <span className="relative text-sm z-10 flex items-center space-x-2">
                     {tab.icon}
                     <span>{tab.name}</span>
                   </span>
