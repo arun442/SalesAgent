@@ -13,7 +13,7 @@ export default function ProjectsList() {
     const router = useRouter();
 
     function getProjectDetails() {
-        axiosPublic.get("project/getProjects")
+        axiosPublic.get("project/getProjects",{headers:{Authorization : `Bearer ${localStorage.getItem('token')}`}})
             .then(res => {
                 setProjects(res.data);
             })
@@ -73,7 +73,7 @@ export default function ProjectsList() {
 
 
     useEffect(() => {
-        axiosPublic.get("project/getOrg")
+        axiosPublic.get("project/getOrg",{headers:{Authorization : `Bearer ${localStorage.getItem('token')}`}})
             .then(res => {
                 setOrganizations(res.data)
             })

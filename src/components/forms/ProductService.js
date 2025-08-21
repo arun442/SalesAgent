@@ -12,6 +12,7 @@ const ProductServicesForm = () => {
   const fields = [
     {key:'product_name',label:'Product Name',placeholder:'e.g. cards'},
     { key: 'product_services_description', label: 'Product/Service Description', placeholder: 'e.g. GPT and Codex APIs' },
+    { key: 'product_url', label: 'Product URL', placeholder: 'e.g. https://www.google.com' },
     { key: 'key_features', label: 'Key Features', placeholder: 'e.g. Text generation, Code writing' },
     { key: 'key_benefits', label: 'Key Benefits', placeholder: 'e.g. Productivity, Speed' },
     { key: 'differentiators', label: 'Differentiators', placeholder: 'e.g. Scale, Quality' },
