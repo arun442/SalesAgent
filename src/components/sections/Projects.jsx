@@ -4,6 +4,8 @@ import { Plus, Eye, Search, Filter, Calendar, Building2, CheckCircle, Clock, Ale
 import { axiosPublic } from '@/app/api/constant';
 import { toast } from 'react-toastify';
 import { useRouter } from "next/navigation";
+import { MdEmail } from 'react-icons/md';
+import { LuBriefcaseBusiness } from 'react-icons/lu';
 
 export default function ProjectsList() {
     const [projects, setProjects] = useState([]);
@@ -33,6 +35,10 @@ export default function ProjectsList() {
     const [organizations, setOrganizations] = useState([]);
     const [products, setProducts] = useState([]);
     const [showAddProductModal, setShowAddProductModal] = useState(false);
+    const[senderEmailOptions,setSenderEmailOptions] = useState([]);
+
+
+    
 
     const [newProject, setNewProject] = useState({
         organization: '',
@@ -47,7 +53,11 @@ export default function ProjectsList() {
         seasonal_campaign : false,
         season_name : "",
         start_date : new Date(),
-        end_date : ""
+        end_date : "",
+        target_campaign : false,
+        target_companies : [],
+        research_acknowledged : false,
+        sender_email : ""
     });
 
     const [newProduct, setNewProduct] = useState({
@@ -88,6 +98,16 @@ export default function ProjectsList() {
             setNewProject(prev => ({ ...prev, product: '' }));
         }
     }, [newProject.organization]);
+
+    useEffect(()=>{
+        if(newProject.organization){
+         axiosPublic.get(`tracking/getEmailsByClientId/${newProject.organization}`)
+         .then(res =>{
+            setSenderEmailOptions(res.data);
+         })
+         .catch(err =>{console.log(err)});
+        }
+    },[newProject.organization]);
 
     // Group projects by organization
     const groupedProjects = projects.reduce((acc, project) => {
@@ -180,6 +200,9 @@ export default function ProjectsList() {
             if (!newProject.end_date) {
                 errors.push('End Date is required');
             }
+            if (!newProject.sender_email) {
+                errors.push('Sender Email is required');
+            }
             
             // Check if seasonal campaign is selected but season name is missing
             if (newProject.seasonal_campaign && !newProject.season_name) {
@@ -235,7 +258,10 @@ export default function ProjectsList() {
             seasonal_campaign: newProject.seasonal_campaign,
             season_name: newProject.seasonal_campaign ? newProject.season_name : null, // Only include if seasonal
             start_date: newProject.start_date,
-            end_date: newProject.end_date
+            end_date: newProject.end_date,
+            to_target : newProject.target_campaign,
+            target_organizations : newProject.target_campaign ? newProject.target_companies : [],
+            email_config : newProject.sender_email
         };
 
         console.log('Submitting project data:', projectData);
@@ -245,12 +271,14 @@ export default function ProjectsList() {
         
         if (response.status === 201) {
             toast.success('Project submitted successfully!');
-
+            console.log('Project response:', response.data);
             const body = {
                 execid : response.data.project.execid,
                 organizationData : response.data.project.organizationData,
                 productData : response.data.project.productData,
             }
+
+            console.log(JSON.stringify(body));
 
             axiosPublic.post('project/start-project',body);
             
@@ -268,7 +296,11 @@ export default function ProjectsList() {
                 seasonal_campaign: false,
                 season_name: '',
                 start_date: '',
-                end_date: ''
+                end_date: '',
+                target_campaign : false,
+                target_companies : [],
+                research_acknowledged : false,
+                sender_email : ""
             });
             
             getProjectDetails();
@@ -310,7 +342,11 @@ export default function ProjectsList() {
                 seasonal_campaign: false,
                 season_name: '',
                 start_date: '',
-                end_date: ''
+                end_date: '',
+                target_campaign : false,
+        target_companies : [],
+        research_acknowledged : false,
+        sender_email : ""
         });
         setShowAddForm(false);
     };
@@ -487,10 +523,6 @@ export default function ProjectsList() {
 
                         {/* Campaign Details Section */}
                         <div className="mb-6">
-                            <h3 className="text-sm font-semibold text-gray-800 mb-4 flex items-center space-x-2">
-                                <Target className="w-4 h-4 text-purple-500" />
-                                <span>Campaign Details</span>
-                            </h3>
 
                             {/* Campaign Name */}
                             <div className="mb-4">
@@ -546,6 +578,103 @@ export default function ProjectsList() {
                             )}
                             </div>
 
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+    {/* Target Campaign Toggle */}
+    <div className="mb-4">
+        <label className="flex items-center space-x-3 cursor-pointer">
+            <input
+                type="checkbox"
+                checked={newProject.target_campaign}
+                onChange={(e) => setNewProject({
+                    ...newProject,
+                    target_campaign : e.target.checked,
+                    target_companies: e.target.checked ? newProject.target_companies || [] : []
+                })}
+                className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+            />
+            <div className="flex items-center space-x-2">
+                <LuBriefcaseBusiness  className="w-4 h-4 text-orange-500" />
+                <span className="text-sm font-semibold text-gray-700">Target Companies</span>
+            </div>
+        </label>
+    </div>
+
+    {/* Target Companies List and Input (Conditional) */}
+    {newProject.target_campaign && (
+        <div className="mb-4 col-span-full">
+            <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
+                <Building2 className="w-4 h-4 text-blue-500" />
+                <span>Target Companies</span>
+            </label>
+            
+            {/* Companies List */}
+            {newProject.target_companies && newProject.target_companies.length > 0 && (
+                <div className="mb-3 p-3 bg-gray-50 rounded-lg border">
+                    <div className="flex flex-wrap gap-2">
+                        {newProject.target_companies.map((company, index) => (
+                            <div key={index} className="flex items-center space-x-2 bg-white px-3 py-1 rounded-full border border-gray-200 shadow-sm">
+                                <span className="text-sm text-gray-700">{company}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        const updatedCompanies = newProject.target_companies.filter((_, i) => i !== index);
+                                        setNewProject({ ...newProject, target_companies: updatedCompanies });
+                                    }}
+                                    className="text-red-500 hover:text-red-700 transition-colors"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Add Company Input */}
+            <div className="flex space-x-2">
+                <input
+                    type="text"
+                    value={newProject.company_input || ''}
+                    onChange={(e) => setNewProject({ ...newProject, company_input: e.target.value })}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const companyName = newProject.company_input?.trim();
+                            if (companyName && !newProject.target_companies?.includes(companyName)) {
+                                const updatedCompanies = [...(newProject.target_companies || []), companyName];
+                                setNewProject({ 
+                                    ...newProject, 
+                                    target_companies: updatedCompanies,
+                                    company_input: ''
+                                });
+                            }
+                        }
+                    }}
+                    className="flex-1 px-4 py-3 border text-xs border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 bg-gray-50 focus:bg-white"
+                    placeholder="Enter company name..."
+                />
+                <button
+                    type="button"
+                    onClick={() => {
+                        const companyName = newProject.company_input?.trim();
+                        if (companyName && !newProject.target_companies?.includes(companyName)) {
+                            const updatedCompanies = [...(newProject.target_companies || []), companyName];
+                            setNewProject({ 
+                                ...newProject, 
+                                target_companies: updatedCompanies,
+                                company_input: ''
+                            });
+                        }
+                    }}
+                    className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                >
+                    <Plus className="w-4 h-4" />
+                </button>
+            </div>
+        </div>
+    )}
+</div>
+
                             {/* Date Range */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 {/* Start Date */}
@@ -581,7 +710,7 @@ export default function ProjectsList() {
                         </div>
 
                         {/* Additional Info */}
-                        <div className="mb-6">
+                        <div className="mb-4">
                             <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2">
                                 <AlertCircle className="w-4 h-4 text-blue-500" />
                                 <span>Additional Info</span>
@@ -595,6 +724,42 @@ export default function ProjectsList() {
                             />
                         </div>
 
+
+                        <div className="mb-6">
+                            <label className="flex items-center space-x-2 text-sm font-semibold text-gray-700 mb-2 required">
+                                <MdEmail className="w-4 h-4 text-blue-500" />
+                                <span>Sender Email</span>
+                            </label>
+                            <select className='w-full px-4 py-3 text-xs border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 resize-none bg-gray-50 focus:bg-white' onChange={(e)=>{setNewProject({...newProject,sender_email:e.target.value})}} value={newProject.sender_email}>
+                                <option value={""} disabled>Please select an email</option>
+                                {senderEmailOptions .map((email, index) => 
+                                    <option key={index} value={email.uuid}>
+                                        {email.email}
+                                    </option>
+                                )}
+                            </select>
+                        </div>
+
+                        <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                            <label className="flex items-start space-x-3 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={newProject.research_acknowledged || false}
+                                    onChange={(e) => setNewProject({
+                                        ...newProject,
+                                        research_acknowledged: e.target.checked
+                                    })}
+                                    className="w-4 h-4 mt-0.5 text-amber-600 bg-gray-100 border-gray-300 rounded focus:ring-amber-500 focus:ring-2"
+                                />
+                                <div className="flex items-center space-x-2">
+                                    <Clock className="w-4 h-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                                    <span className="text-xs font-medium text-amber-800">
+                                        I have understood that the market research will take time..(apprx 10 -15 mins)
+                                    </span>
+                                </div>
+                            </label>
+                        </div>
+
                         {/* Action Buttons */}
                         <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-8">
                             <button
@@ -606,6 +771,7 @@ export default function ProjectsList() {
                             </button>
                             <button
                                 onClick={handleSubmitProject}
+                                disabled={!newProject.research_acknowledged}
                                 // disabled={!newProject.organization || !newProject.product || !newProject.campaign_name || !newProject.start_date || !newProject.end_date}
                                 className="flex-1 px-6 py-3 text-sm bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:from-blue-700 hover:to-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 font-medium shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 flex items-center justify-center"
                             >

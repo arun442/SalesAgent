@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Menu, X, Coins, Bell, User } from 'lucide-react';
+import { Menu, X, Coins, Bell, User, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface HeaderProps {
@@ -57,21 +57,27 @@ const Header = ({ onMenuToggle, isMobileMenuOpen }: HeaderProps) => {
           </motion.div>
 
           {/* Notifications */}
-          <motion.button
+          {/* <motion.button
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.95 }}
             className="p-2 rounded-lg hover:bg-white/20 transition-colors relative"
           >
             <Bell className="w-5 h-5 text-gray-700" />
             <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
-          </motion.button>
+          </motion.button> */}
 
           {/* Profile */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center cursor-pointer"
+            className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center cursor-pointer"
           >
             <User className="w-4 h-4 text-white" />
+          </motion.div>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            className="w-8 h-8 bg-black rounded-full flex items-center justify-center cursor-pointer"
+          >
+            <LogOut className="w-4 h-4 text-white" onClick={()=>{router.push("/");localStorage.clear()}} />
           </motion.div>
         </div>
       </div>

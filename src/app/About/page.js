@@ -40,12 +40,8 @@ export default function About() {
             </p>
             <ul className="space-y-4">
               <li className="flex items-center gap-3">
-                <span className="text-lg">📞</span>
-                <span>+919876543210</span>
-              </li>
-              <li className="flex items-center gap-3">
                 <span className="text-lg">📧</span>
-                <span>Support@gkt.ai</span>
+                <span>genquiry@globalknowledgetech.com</span>
               </li>
               <li className="flex items-center gap-3">
                 <span className="text-lg">📍</span>

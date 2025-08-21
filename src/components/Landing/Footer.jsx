@@ -8,13 +8,13 @@ export default function Footer() {
         </p>
         <div className="space-x-4 mt-4 md:mt-0">
           <a
-            href="#"
+            href="/PrivacyPolicy"
             className="hover:text-primary cursor-pointer"
           >
             Privacy Policy
           </a>
           <span>|</span>
-          <a href="#" className="hover:text-primary cursor-pointer">
+          <a href="/TermsOfUse" className="hover:text-primary cursor-pointer">
             Terms of Use
           </a>
         </div>

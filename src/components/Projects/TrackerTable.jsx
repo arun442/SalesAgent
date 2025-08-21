@@ -160,6 +160,9 @@ const CampaignTrackersDashboard = ({ execId,curStatus }) => {
               <option value="replied">Replied</option>
             </select>
           </div>
+          <div>
+            <button className='btn bg-blue-500 px-4 py-1 rounded-xl text-sm cursor-pointer text-white' onClick={()=>fetchCampaignData()}>Refresh</button>
+          </div>
         </div>
       </div>
 

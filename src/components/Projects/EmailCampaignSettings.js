@@ -4,7 +4,7 @@ import { Edit3, Settings, Mail, Target, Calendar, Activity } from 'lucide-react'
 import { axiosPublic } from '@/app/api/constant';
 import { toast } from 'react-toastify';
  
-const EmailCampaignSettings = ({execId}) => {
+const EmailCampaignSettings = ({execId,curStatus}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -89,7 +89,7 @@ const EmailCampaignSettings = ({execId}) => {
  
   useEffect(() => {
     fetchCampaignData();
-  }, []);
+  }, [curStatus]);
  
   const preparePayloadForUpsert = (data) => {
     return {
@@ -279,6 +279,7 @@ const EmailCampaignSettings = ({execId}) => {
               <h1 className="text-sm font-bold text-gray-900">Campaign Settings</h1>
               <p className="text-xs text-gray-500 mt-1">Manage your email campaign configuration</p>
             </div>
+             {curStatus === "Campaign Strategy" &&
             <div className="flex gap-3">
               {!isEditing ? (
                 <button
@@ -305,6 +306,8 @@ const EmailCampaignSettings = ({execId}) => {
                   </button>
                 </div>
               )}
+
+             
               <button
                   onClick={() => handleStartCampagn()}
                   className="flex  items-center px-4 py-2 text-xs font-medium text-white bg-[#0056D2] hover:bg-blue-700 rounded-lg transition-colors cursor-pointer"
@@ -312,7 +315,9 @@ const EmailCampaignSettings = ({execId}) => {
                   {/* <Edit3 className="h-4 w-4 mr-2" /> */}
                   Start Campaign
                 </button>
+
             </div>
+              }
           </div>
         </div>
       </div>

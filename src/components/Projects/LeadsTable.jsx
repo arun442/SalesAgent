@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Mail, MapPin, Building, Calendar, ExternalLink, Search, Filter } from 'lucide-react';
 import { axiosPublic } from '@/app/api/constant';
+import axios from 'axios';
  
 const LeadsDashboard = ({execId,curStatus}) => {
   const [leads, setLeads] = useState([]);
@@ -19,6 +20,9 @@ const LeadsDashboard = ({execId,curStatus}) => {
     
       setLoading(true);
       await axiosPublic.get(`api/leads/execution/${execId}`)
+    // await axios.post(`https://gkcsaia.app.n8n.cloud/webhook/leads`,{
+        //   "ececution_id": execId
+        // })
       .then(res =>{
         const leadsData = res.data.data || res.data;
         setLeads(leadsData);

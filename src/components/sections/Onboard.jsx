@@ -1102,14 +1102,14 @@ export default function OrganizationDashboard() {
           </div>
         </div>
         
-        <div className="flex gap-2">
+        {/* <div className="flex gap-2">
           <button className="px-3 py-2 text-xs border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
             Edit
           </button>
           <button className="px-3 py-2 text-xs bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
             View Details
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

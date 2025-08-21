@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import { axiosPublic } from '../api/constant';
 export default function LoginPage() {
   const [isSignup, setIsSignup] = useState(false);
-  const [useOtp, setUseOtp] = useState(false);
+  const [useOtp, setUseOtp] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -314,7 +314,7 @@ export default function LoginPage() {
                   </button>
                 )}
                  {/* Login Method Toggle */}
-                <div className="flex space-x-4 mt-2">
+                {/* <div className="flex space-x-4 mt-2">
                   <button
                     type="button"
                     onClick={() => {setUseOtp(false); setOtpSent(false);}}
@@ -337,7 +337,7 @@ export default function LoginPage() {
                   >
                     OTP
                   </button>
-                </div>
+                </div> */}
 
                 {!useOtp && (
                   <div className="text-center">
